@@ -1,6 +1,7 @@
 /* GM Scan Pro - Service Worker
-   Caches the app shell so the PWA works fully offline. */
-const CACHE_NAME = 'gm-scan-pro-v11';
+   Caches the app shell so the PWA works fully offline.
+   Bump CACHE_NAME on every release so devices pick up the new files. */
+const CACHE_NAME = 'gm-scan-pro-v12';
 const APP_SHELL = [
   './',
   './index.html',
@@ -8,6 +9,16 @@ const APP_SHELL = [
   './icon-192.png',
   './icon-512.png',
   './apple-touch-icon.png',
+  './css/app.css',
+  './js/engine-boot.js',
+  './js/config.js',
+  './js/utils.js',
+  './js/dpm.js',
+  './js/parser.js',
+  './js/scanner.js',
+  './js/history.js',
+  './js/settings.js',
+  './js/ui.js',
   './vendor/zxing_reader.js',
   './vendor/zxing_reader.wasm'
 ];
@@ -61,4 +72,4 @@ self.addEventListener('fetch', (event) => {
       return cached || network;
     })
   );
-});
+};

@@ -1,17 +1,9 @@
-<!DOCTYPE html>
-<!DOCTYPE html>
-<html><head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>GM Scan Pro · GMW 15862</title>
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="GM Scan Pro">
-<meta name="mobile-web-app-capable" content="yes">
-<meta name="theme-color" content="#eef2f9">
-<link rel="manifest" href="manifest.json">
-<link rel="apple-touch-icon" href="apple-touch-icon.png">
-
+/* ==========================================================================
+ * GM Scan Pro — css/app.css
+ * --------------------------------------------------------------------------
+ * Every application style, extracted verbatim from the original
+ * single-file index.html. No visual changes.
+ * ========================================================================== */
 
 <link rel="stylesheet" href="css/app.css">
 <script src="vendor/zxing_reader.js"></script>
