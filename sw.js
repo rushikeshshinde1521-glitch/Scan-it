@@ -1,13 +1,15 @@
 /* GM Scan Pro - Service Worker
    Caches the app shell so the PWA works fully offline. */
-const CACHE_NAME = 'gm-scan-pro-v6';
+const CACHE_NAME = 'gm-scan-pro-v7';
 const APP_SHELL = [
   './',
   './index.html',
   './manifest.json',
   './icon-192.png',
   './icon-512.png',
-  './apple-touch-icon.png'
+  './apple-touch-icon.png',
+  './vendor/zxing_reader.js',
+  './vendor/zxing_reader.wasm'
 ];
 
 self.addEventListener('install', (event) => {
