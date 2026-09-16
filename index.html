@@ -1327,8 +1327,50 @@ function wasmDecodeImageData(imageData, opts) {
         return null;
     }).catch(() => null);
 }
+// DPM background sweep for live camera (Dot Pin tab): runs the same dot-peen
+// enhancement (macro region + 4 overlapping tiles) on a captured frame.
+// At most one sweep runs at a time; the fast raw-decode loop keeps running
+// between sweeps, so the camera never stalls waiting on it.
+let dpmSweepBusy = false;
+function runDpmLiveSweep(imageData) {
+    if (dpmSweepBusy || liveScanInterval === null) return Promise.resolve(null);
+    dpmSweepBusy = true;
+    const w = imageData.width, h = imageData.height;
+    const src = document.createElement('canvas');
+    src.width = w; src.height = h;
+    try { src.getContext('2d').putImageData(imageData, 0, 0); }
+    catch (e) { dpmSweepBusy = false; return Promise.resolve(null); }
+    // Same regions as the photo-path DPM attempts, as fractions of the frame.
+    const regions = [
+        { x: 0.12, y: 0.40, rw: 0.50, rh: 0.50 }, // macro close-up
+        { x: 0,    y: 0,    rw: 2 / 3, rh: 2 / 3 }, // 2x2 overlapping tiles
+        { x: 1 / 3, y: 0,   rw: 2 / 3, rh: 2 / 3 },
+        { x: 0,    y: 1 / 3, rw: 2 / 3, rh: 2 / 3 },
+        { x: 1 / 3, y: 1 / 3, rw: 2 / 3, rh: 2 / 3 },
+    ];
+    let ri = 0;
+    const done = (text) => { dpmSweepBusy = false; return text; };
+    const next = () => {
+        if (liveScanInterval === null || ri >= regions.length) return Promise.resolve(done(null));
+        const r = regions[ri++];
+        const cw = Math.max(120, Math.round(w * r.rw)), ch = Math.max(120, Math.round(h * r.rh));
+        const cx = Math.max(0, Math.round(w * r.x)), cy = Math.max(0, Math.round(h * r.y));
+        let c = document.createElement('canvas');
+        c.width = cw; c.height = ch;
+        c.getContext('2d').drawImage(src, cx, cy, cw, ch, 0, 0, cw, ch);
+        try { c = dpmEnhanceCanvas(c); }
+        catch (e) { return next(); }
+        let id = null;
+        try { id = c.getContext('2d').getImageData(0, 0, c.width, c.height); }
+        catch (e) { return next(); }
+        return wasmDecodeImageData(id, { denoise: true }).then(text => text ? done(text) : next());
+    };
+    return next();
+}
+
 // Continuous live-scan loop: grabs video frames and decodes them with the WASM
 // engine. Chained (never overlapping) so the CPU stays free for the camera.
+let dpmLiveFrameCounter = 0;
 function startWasmFrameLoop(videoEl) {
     if (liveScanInterval) clearInterval(liveScanInterval);
     if (!wasmVideoCanvas) wasmVideoCanvas = document.createElement('canvas');
@@ -1371,6 +1413,20 @@ function startWasmFrameLoop(videoEl) {
                 onPhotoDecodeSuccess(text);
                 return;
             }
+            // Dot Pin tab: every ~12th frame gets the dot-peen enhancement sweep
+            // in the background while the fast loop keeps running. The raw decode
+            // above stays as the cheap path (paper labels still work here too).
+            if (document.body.dataset.scanmode === 'dpm') {
+                dpmLiveFrameCounter++;
+                if (dpmLiveFrameCounter % 12 === 0 && !dpmSweepBusy) {
+                    runDpmLiveSweep(imageData).then(dpmText => {
+                        if (dpmText && liveScanInterval !== null) {
+                            stopCameraScan(true);
+                            onPhotoDecodeSuccess(dpmText);
+                        }
+                    });
+                }
+            }
             armNext();
         });
     };
@@ -1404,7 +1460,8 @@ function startWasmLiveCamera() {
             activeVideoStream = stream;
             videoEl.srcObject = stream;
             videoEl.play();
-            document.getElementById('cameraStatus').innerHTML = '<div style="color:var(--green);font-size:0.88rem;font-weight:600;">&#127919; Scanner Active &bull; Auto-Scanning Data Matrix code...</div>';
+            const dpmModeNow = document.body.dataset.scanmode === 'dpm';
+            document.getElementById('cameraStatus').innerHTML = '<div style="color:var(--green);font-size:0.88rem;font-weight:600;">&#127919; Scanner Active &bull; Auto-Scanning ' + (dpmModeNow ? 'dot-peen marks' : 'Data Matrix code') + '...</div>';
             setTimeout(() => applyAutoFocusToVideo(videoEl), 400);
             setTimeout(() => applyAutoFocusToVideo(videoEl), 1500);
             startWasmFrameLoop(videoEl);
