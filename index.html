@@ -189,6 +189,9 @@ body{
 .field{display:flex;flex-direction:column;gap:6px;font-size:.78rem;font-weight:600;color:var(--muted);}
 .field input{padding:11px 12px;background:#fff;border:1px solid var(--line);border-radius:11px;color:var(--txt);font-size:.95rem;font-family:inherit;}
 .field input:focus{outline:none;border-color:var(--cyan);box-shadow:0 0 0 3px rgba(14,165,196,.18);}
+.duns-wrap{display:flex;align-items:stretch;}
+.duns-prefix{display:flex;align-items:center;padding:0 12px;background:#eef2f5;border:1px solid var(--line);border-right:none;border-radius:11px 0 0 11px;color:var(--muted);font-size:.95rem;font-weight:700;letter-spacing:.04em;}
+.duns-wrap input{flex:1;min-width:0;border-radius:0 11px 11px 0;}
 
 /* scan input */
 textarea#scan{
@@ -430,12 +433,12 @@ body[data-tab="scan"] .bottomdock .actionbar{display:flex;}
   <section id="tab-settings" class="tabpage">
     <div class="card">
       <div class="card-title"><span class="num">⚙</span> Label Rules <small>GMW 15862 fields</small></div>
-      <label class="field"><span>Expected DUNS</span>
-        <input id="setDuns" inputmode="text" autocomplete="off" autocapitalize="characters"
-               placeholder="12V606038362" oninput="onDunsInput()">
-      </label>
+      <div class="field"><span>Expected DUNS</span>
+        <div class="duns-wrap"><span class="duns-prefix">12V</span><input id="setDuns" inputmode="numeric" autocomplete="off"
+               placeholder="606038362" maxlength="9" oninput="onDunsInput()"></div>
+      </div>
       <div class="field-err" id="dunsErr"></div>
-      <div class="hint">Format: <code>12V</code> + 9 digits. Labels whose DUNS field differs from this fail validation. Typing just the 9 digits fills in the <code>12V</code> automatically. Saved on this device.</div>
+      <div class="hint"><code>12V</code> is fixed — enter just the 9 digits. Labels whose DUNS field differs from <code>12V</code> + this fail validation. Saved on this device.</div>
     </div>
 
     <div class="card">
@@ -600,15 +603,19 @@ function stepVal(id,delta){
   buildRules();
   persistSettings();
 }
-const DEFAULT_DUNS='12V606038362';
+const DUNS_PREFIX='12V';
+const DEFAULT_DUNS_DIGITS='606038362';
 /* ===== app settings (persisted on this device) ===== */
 const APP_SETTINGS_KEY='gmscanpro_appsettings_v1';
-let appSettings={duns:DEFAULT_DUNS,serverUrl:'',serverKey:'',serverMode:'off'};
+let appSettings={duns:DEFAULT_DUNS_DIGITS,serverUrl:'',serverKey:'',serverMode:'off'};
 try{const _s=JSON.parse(localStorage.getItem(APP_SETTINGS_KEY)||'{}');if(_s&&typeof _s==='object')appSettings=Object.assign(appSettings,_s);}catch(e){}
+/* Migrate installs that stored the old full "12Vxxxxxxxxx" form: keep just the 9 digits. */
+if(/^12V\d{9}$/i.test(String(appSettings.duns||'')))appSettings.duns=String(appSettings.duns).slice(3).toUpperCase();
 function saveAppSettings(){try{localStorage.setItem(APP_SETTINGS_KEY,JSON.stringify(appSettings));}catch(e){}}
-function expectedDuns(){return String(appSettings.duns||DEFAULT_DUNS).toUpperCase();}
-function normalizeDunsInput(v){v=String(v||'').trim().toUpperCase().replace(/\s+/g,'');if(/^\d{9}$/.test(v))return '12V'+v;return v;}
-function validDunsFormat(v){return /^12V\d{9}$/.test(v);}
+function expectedDunsDigits(){return String(appSettings.duns||DEFAULT_DUNS_DIGITS).toUpperCase().replace(/\D/g,'').slice(0,9);}
+function expectedDuns(){return DUNS_PREFIX+expectedDunsDigits();}
+function normalizeDunsInput(v){v=String(v||'').trim().toUpperCase().replace(/\s+/g,'');if(v.indexOf(DUNS_PREFIX)===0)v=v.slice(DUNS_PREFIX.length);return v.replace(/\D/g,'').slice(0,9);}
+function validDunsFormat(v){return /^\d{9}$/.test(v);}
 let lastScanAssemblies=[];
 function deviceId(){try{let id=localStorage.getItem('gmscanpro_device');if(!id){id='dev-'+Math.random().toString(36).slice(2,10)+Date.now().toString(36);localStorage.setItem('gmscanpro_device',id);}return id;}catch(e){return 'dev-unknown';}}
 function toggleExpected(){
@@ -1926,7 +1933,7 @@ function renderHistoryTab(){ let b=document.getElementById('historyTabBody'); if
 
 /* ---------- settings UI ---------- */
 function applySettingsToUI(){
-  let d=document.getElementById('setDuns'); if(d) d.value=expectedDuns();
+  let d=document.getElementById('setDuns'); if(d) d.value=expectedDunsDigits();
   let u=document.getElementById('setSrvUrl'); if(u) u.value=appSettings.serverUrl||'';
   let k=document.getElementById('setSrvKey'); if(k) k.value=appSettings.serverKey||'';
   document.querySelectorAll('input[name="srvMode"]').forEach(r=>{r.checked=(r.value===appSettings.serverMode);});
@@ -1938,7 +1945,7 @@ function onDunsInput(){
   let raw=el.value;
   let n=normalizeDunsInput(raw);
   if(validDunsFormat(n)){ appSettings.duns=n; if(el.value!==n) el.value=n; if(err) err.textContent=''; saveAppSettings(); }
-  else { if(err) err.textContent = raw.trim() ? 'Use 12V + 9 digits (e.g. 12V606038362).' : ''; }
+  else { if(err) err.textContent = raw.trim() ? 'Enter 9 digits (e.g. 606038362).' : ''; }
   updateConnPill();
 }
 function onSrvSettingsInput(){
@@ -1954,7 +1961,7 @@ function syncSrvFields(){ let f=document.getElementById('srvFields'); if(f) f.st
 function toggleKeyVis(){ let k=document.getElementById('setSrvKey'); if(k) k.type=(k.type==='password'?'text':'password'); }
 function resetAppSettings(){
   if(!confirm('Reset DUNS and server settings to defaults?')) return;
-  appSettings={duns:DEFAULT_DUNS,serverUrl:'',serverKey:'',serverMode:'off'};
+  appSettings={duns:DEFAULT_DUNS_DIGITS,serverUrl:'',serverKey:'',serverMode:'off'};
   saveAppSettings(); applySettingsToUI(); updateConnPill(); showToast('Settings reset.');
 }
 function updateConnPill(state){
@@ -1970,7 +1977,7 @@ function updateConnPill(state){
 window.addEventListener('storage',(e)=>{
   if(e.key===APP_SETTINGS_KEY){
     try{const s=JSON.parse(e.newValue||'{}');
-      if(s&&typeof s==='object'){appSettings=Object.assign({duns:DEFAULT_DUNS,serverUrl:'',serverKey:'',serverMode:'off'},s);applySettingsToUI();updateConnPill();}
+      if(s&&typeof s==='object'){appSettings=Object.assign({duns:DEFAULT_DUNS_DIGITS,serverUrl:'',serverKey:'',serverMode:'off'},s);if(/^12V\d{9}$/i.test(String(appSettings.duns||'')))appSettings.duns=String(appSettings.duns).slice(3).toUpperCase();applySettingsToUI();updateConnPill();}
     }catch(err){}
   }
 });
