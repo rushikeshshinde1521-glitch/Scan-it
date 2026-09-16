@@ -274,11 +274,63 @@ td .no{color:var(--red);font-weight:800;}
 .pwa button{border:none;background:linear-gradient(135deg,#22d3ee,#2563eb);color:#fff;padding:9px 14px;border-radius:12px;font-weight:800;font-size:.82rem;cursor:pointer;white-space:nowrap;}
 .hint{color:var(--muted);font-size:.78rem;line-height:1.45;margin-top:8px;}
 .note{color:var(--muted);font-size:.74rem;text-align:center;margin-top:16px;line-height:1.5;}
-</style>
-</head><body>
-<div class="app">
 
-  <!-- top bar -->
+/* ===== app-like shell: tabs + bottom dock ===== */
+.tabpage{display:none;}
+.tabpage.active{display:block;animation:fadeUp .22s ease;}
+@keyframes fadeUp{from{opacity:0;transform:translateY(8px);}to{opacity:1;transform:none;}}
+body[data-tab="scan"]{padding-bottom:186px;}
+body[data-tab="history"],body[data-tab="settings"]{padding-bottom:112px;}
+body[data-tab="scan"] .toast{bottom:196px;}
+.bottomdock{position:fixed;left:0;right:0;bottom:0;z-index:60;
+  background:rgba(247,249,253,.95);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);
+  border-top:1px solid var(--line);padding-bottom:env(safe-area-inset-bottom);}
+.bottomdock .actionbar{position:static;z-index:auto;background:none;backdrop-filter:none;-webkit-backdrop-filter:none;
+  padding:10px 16px 4px;display:none;}
+body[data-tab="scan"] .bottomdock .actionbar{display:flex;}
+.tabbar{display:flex;gap:4px;padding:6px 8px 8px;}
+.tabbar button{flex:1;border:none;background:none;color:var(--muted);font-weight:700;font-size:.68rem;
+  display:flex;flex-direction:column;align-items:center;gap:2px;padding:7px 4px;border-radius:14px;
+  cursor:pointer;position:relative;font-family:inherit;}
+.tabbar button .ticon{display:flex;align-items:center;justify-content:center;width:46px;height:30px;border-radius:12px;}
+.tabbar button.active{color:var(--cyan2);}
+.tabbar button.active .ticon{background:linear-gradient(135deg,rgba(34,211,238,.20),rgba(37,99,235,.20));}
+.tabbar .tbadge{position:absolute;top:0;right:calc(50% - 26px);background:var(--cyan2);color:#fff;
+  font-size:.62rem;font-weight:800;min-width:18px;height:18px;border-radius:10px;
+  display:flex;align-items:center;justify-content:center;padding:0 5px;}
+.conn-pill{font-size:.68rem;font-weight:800;padding:6px 10px;border-radius:20px;background:#eef2f8;
+  border:1px solid var(--line);color:var(--muted);white-space:nowrap;}
+.conn-pill.srv{background:#e8f4ff;color:var(--cyan2);border-color:rgba(37,99,235,.35);}
+.conn-pill.warn{background:#fff7e6;color:#b97a0a;border-color:rgba(232,160,10,.45);}
+.conn-pill.ok{background:var(--green-bg);color:var(--green);border-color:rgba(21,148,90,.35);}
+/* ===== settings ===== */
+.set-label{font-size:.72rem;font-weight:800;letter-spacing:.05em;color:var(--muted);margin:14px 0 8px;text-transform:uppercase;}
+.set-label:first-child{margin-top:2px;}
+.field-err{color:var(--red);font-size:.76rem;font-weight:700;min-height:1.1em;margin-top:4px;}
+.pwrow{display:flex;gap:8px;}
+.pwrow input{flex:1;min-width:0;}
+.pwrow button{width:50px;flex:0 0 auto;border-radius:11px;border:1px solid var(--line);background:#fff;cursor:pointer;font-size:1.05rem;}
+.srv-status{margin-top:10px;font-size:.8rem;font-weight:600;color:var(--muted);background:#f6f8fc;
+  border:1px solid var(--line-soft);border-radius:12px;padding:10px 12px;line-height:1.45;}
+.srv-status.ok{color:var(--green);background:var(--green-bg);border-color:rgba(21,148,90,.3);}
+.srv-status.bad{color:var(--red);background:var(--red-bg);border-color:rgba(214,58,77,.3);}
+.apibox{margin-top:12px;font-size:.78rem;color:var(--muted);background:#f6f8fc;border:1px solid var(--line-soft);
+  border-radius:12px;padding:10px 12px;line-height:1.5;}
+.apibox summary{font-weight:800;color:var(--txt);cursor:pointer;}
+.apibox code{background:#e4ebf6;padding:1px 6px;border-radius:6px;font-size:.74rem;color:#1b2340;}
+.apibox pre{background:#1b2340;color:#dfe7ff;padding:10px;border-radius:10px;overflow-x:auto;font-size:.68rem;margin:8px 0;line-height:1.5;}
+/* ===== server verdict chips (results area) ===== */
+.srv-chip{display:inline-flex;align-items:center;gap:6px;font-size:.78rem;font-weight:800;
+  padding:8px 13px;border-radius:20px;margin-top:10px;line-height:1.35;}
+.srv-chip.checking{background:#eef2f8;color:var(--muted);}
+.srv-chip.ok{background:var(--green-bg);color:var(--green);border:1px solid rgba(21,148,90,.3);}
+.srv-chip.dup{background:var(--red-bg);color:var(--red);border:1px solid rgba(214,58,77,.35);}
+.srv-chip.warn{background:#fff7e6;color:#b97a0a;border:1px solid rgba(232,160,10,.4);}
+.history-list{margin-top:4px;}
+.seg .soff{font-size:.72rem;color:var(--muted);font-weight:600;}
+</style>
+</head><body data-tab="scan"><div class="app">
+<!-- top bar -->
   <div class="topbar">
     <div class="brand">
       <div class="logo">
@@ -290,15 +342,15 @@ td .no{color:var(--red);font-weight:800;}
       </div>
     </div>
     <div class="top-actions">
-      <button class="icbtn" onclick="openHistoryModal()" title="History" aria-label="History"><svg viewBox="0 0 24 24" width="21" height="21" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15.5 13.8"/></svg><span class="badge" id="historyBadgeCount">0</span></button>
+      <span class="conn-pill" id="connPill" title="Duplicate-check connection">● Local</span>
+      <button class="icbtn" onclick="switchTab('history')" title="History" aria-label="History"><svg viewBox="0 0 24 24" width="21" height="21" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15.5 13.8"/></svg><span class="badge" id="historyBadgeCount">0</span></button>
       <button class="icbtn" onclick="openHelpModal()" title="Help" aria-label="Help"><svg viewBox="0 0 24 24" width="21" height="21" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M9.1 9a3 3 0 0 1 5.8 1c0 2-3 2.5-3 3.5"/><circle cx="12" cy="17.4" r="0.4" fill="currentColor"/></svg></button>
     </div>
   </div>
 
-  <!-- install banner -->
-
-
-  <!-- HERO scanner card -->
+  
+  <section id="tab-scan" class="tabpage active">
+<!-- HERO scanner card -->
   <div class="hero">
     <div class="hero-glow"></div>
     <div class="viewfinder">
@@ -347,23 +399,8 @@ td .no{color:var(--red);font-weight:800;}
         </div>
       </div>
     </div>
-
-    <div class="toggle-row">
-      <div class="toggle-txt"><div class="t">Manual Rules</div><div class="s">Verify parts against expected values</div></div>
-      <label class="switch"><input type="checkbox" id="showExpected" onchange="toggleExpected()"><span class="track"></span><span class="thumb"></span></label>
-    </div>
-    <div class="toggle-row">
-      <div class="toggle-txt"><div class="t">Duplicate Check</div><div class="s">Flag repeated trace codes</div></div>
-      <label class="switch"><input type="checkbox" id="checkDup"><span class="track"></span><span class="thumb"></span></label>
-    </div>
-
-    <div id="expectedBox" style="display:none;">
-      <div class="sub" style="margin-bottom:10px;">Leave fields blank to ignore that check.</div>
-      <div id="rules" class="rules-wrap"></div>
-    </div>
   </div>
-
-  <!-- 3. scan input -->
+<!-- 3. scan input -->
   <div class="card">
     <div class="card-title"><span class="num">3</span> Scan Input <small>paste or auto-loaded</small></div>
     <textarea id="scan" onpaste="handleTouchScreenPaste(event)" oninput="handleScanInput(event)" placeholder="Paste scan data here…"></textarea>
@@ -373,16 +410,111 @@ td .no{color:var(--red);font-weight:800;}
   <!-- RESULTS -->
   <div id="out"></div>
 
-  <div class="row2">
-    <button onclick="clearScan()">Clear Scan</button>
-    <button onclick="exportCSV()">Export CSV</button>
-    <button onclick="resetAll()">Reset</button>
-    <button class="danger" onclick="clearHistory()">Clear History</button>
-  </div>
-  <div class="note">GM Scan Pro · GMW 15862 compliance validator.<br>Parsing &amp; validation engine unchanged.<br>Works as a mobile app — history is saved on this device until you clear it.</div>
+      <div class="row2">
+      <button onclick="clearScan()">Clear Scan</button>
+      <button onclick="resetAll()">Reset Form</button>
+    </div>
+  </section>
+
+  <section id="tab-history" class="tabpage">
+    <div class="card">
+      <div class="card-title"><span class="num">🕒</span> Scan History <small>last 20 on this device</small></div>
+      <div class="row2" style="margin-top:0;margin-bottom:12px;">
+        <button onclick="exportCSV()">Export CSV</button>
+        <button class="danger" onclick="clearHistory()">Clear History</button>
+      </div>
+      <div id="historyTabBody" class="history-list"></div>
+    </div>
+  </section>
+
+  <section id="tab-settings" class="tabpage">
+    <div class="card">
+      <div class="card-title"><span class="num">⚙</span> Label Rules <small>GMW 15862 fields</small></div>
+      <label class="field"><span>Expected DUNS</span>
+        <input id="setDuns" inputmode="text" autocomplete="off" autocapitalize="characters"
+               placeholder="12V606038362" oninput="onDunsInput()">
+      </label>
+      <div class="field-err" id="dunsErr"></div>
+      <div class="hint">Format: <code>12V</code> + 9 digits. Labels whose DUNS field differs from this fail validation. Typing just the 9 digits fills in the <code>12V</code> automatically. Saved on this device.</div>
+    </div>
+
+    <div class="card">
+      <div class="card-title"><span class="num">🎯</span> Manual Rules <small>expected values</small></div>
+    <div class="toggle-row">
+      <div class="toggle-txt"><div class="t">Manual Rules</div><div class="s">Verify parts against expected values</div></div>
+      <label class="switch"><input type="checkbox" id="showExpected" onchange="toggleExpected()"><span class="track"></span><span class="thumb"></span></label>
+    </div>
+    <div id="expectedBox" style="display:none;">
+      <div class="sub" style="margin-bottom:10px;">Leave fields blank to ignore that check.</div>
+      <div id="rules" class="rules-wrap"></div>
+    </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title"><span class="num">⧉</span> Duplicate Check <small>local + server</small></div>
+    <div class="toggle-row">
+      <div class="toggle-txt"><div class="t">Duplicate Check</div><div class="s">Flag repeated trace codes</div></div>
+      <label class="switch"><input type="checkbox" id="checkDup"><span class="track"></span><span class="thumb"></span></label>
+    </div>
+
+
+      <div class="set-label">Company server</div>
+      <div class="hint" style="margin-top:0;">The on-device check above always runs and works with no connection. Turn this on to also compare trace codes against the company server after each scan — the local check never changes.</div>
+      <div class="seg" style="margin-bottom:12px;">
+        <label><input type="radio" name="srvMode" value="off" onchange="onSrvModeChange('off')"><span>Off</span></label>
+        <label><input type="radio" name="srvMode" value="server" onchange="onSrvModeChange('server')"><span>Local + Server</span></label>
+      </div>
+      <div id="srvFields">
+        <label class="field"><span>Server URL</span>
+          <input id="setSrvUrl" inputmode="url" autocomplete="off" autocapitalize="off" spellcheck="false"
+                 placeholder="https://server.company.com:5000" oninput="onSrvSettingsInput()">
+        </label>
+        <label class="field"><span>API key <span class="soff">(optional — must match the server)</span></span>
+          <div class="pwrow">
+            <input id="setSrvKey" type="password" autocomplete="off" placeholder="••••••••" oninput="onSrvSettingsInput()">
+            <button type="button" onclick="toggleKeyVis()" title="Show/hide">👁</button>
+          </div>
+        </label>
+        <div class="row2">
+          <button onclick="testServerConnection()">Test connection</button>
+        </div>
+        <div class="srv-status" id="srvTestStatus">Not configured.</div>
+        <details class="apibox">
+          <summary>What the server must do <span style="font-weight:400;">(for your IT team)</span></summary>
+          <p style="margin:8px 0;">After each scan the app sends:</p>
+          <pre>POST {server URL}/api/duplicates/check
+Content-Type: application/json
+X-API-Key: (your key, if set)
+
+{ "traces": ["TABC123...", "TDEF456..."],
+  "device": "dev-9f3k2l8x",
+  "duns": "12V606038362" }</pre>
+          <p style="margin:8px 0;">The server answers:</p>
+          <pre>{ "duplicates": ["TABC123..."] }</pre>
+          <p style="margin:8px 0 0;">An empty list means no duplicates. The included <code>server.py</code> already implements exactly this — IT only points it at the real trace database (2 marked spots) and gives it a URL the shopfloor phones can reach.</p>
+        </details>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title"><span class="num">📱</span> App</div>
+      <div class="pwa">
+        <span class="pin"><svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><rect x="7" y="2" width="10" height="20" rx="2.5"/><path d="M11 18h2"/><path d="M11 6h2"/></svg></span>
+        <div style="flex:1;min-width:0;"><div class="pt">Install to Phone</div><div class="ps">Full-screen &amp; offline auto-scanner</div></div>
+        <button onclick="setTimeout(launchInstalledApp,120);">Install</button>
+      </div>
+      <div class="row2">
+        <button onclick="resetAppSettings()">Reset settings</button>
+      </div>
+<div class="note">GM Scan Pro · GMW 15862 compliance validator.<br>Parsing &amp; validation engine unchanged.<br>Works as a mobile app — history is saved on this device until you clear it.</div>
 </div>
 
-<!-- bottom action bar -->
+
+    </div>
+  </section>
+</div>
+
+<div class="bottomdock">
 <div class="actionbar">
   <button class="abtn" onclick="triggerPhotoScan()" title="Photo"><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="4"/><circle cx="8.5" cy="8.5" r="1.6"/><path d="M20.5 16.5 15.6 11.6a1.5 1.5 0 0 0-2.12 0L6 19"/></svg></button>
   <button class="validateBtn" onclick="validateAndShow()">
@@ -390,6 +522,12 @@ td .no{color:var(--red);font-weight:800;}
     AUDIT &amp; VALIDATE
   </button>
   <button class="abtn" onclick="startCameraScan()" title="Camera"><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg></button>
+</div>
+  <nav class="tabbar">
+    <button data-tab="scan" class="active" onclick="switchTab('scan')"><span class="ticon"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7V5a2 2 0 0 1 2-2h2M17 3h2a2 2 0 0 1 2 2v2M21 17v2a2 2 0 0 1-2 2h-2M7 21H5a2 2 0 0 1-2-2v-2"/><circle cx="12" cy="12" r="3.2"/></svg></span>Scan</button>
+    <button data-tab="history" onclick="switchTab('history')"><span class="ticon"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15.5 13.8"/></svg></span>History<span class="tbadge" id="tabHistoryBadge" style="display:none;">0</span></button>
+    <button data-tab="settings" onclick="switchTab('settings')"><span class="ticon"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></span>Settings</button>
+  </nav>
 </div>
 
 <!-- hidden file input -->
@@ -451,6 +589,7 @@ td .no{color:var(--red);font-weight:800;}
 
 <div id="toast" class="toast"></div>
 
+
 <script>
 function stepVal(id,delta){
   let el=document.getElementById(id);
@@ -461,7 +600,17 @@ function stepVal(id,delta){
   buildRules();
   persistSettings();
 }
-const D='12V606038362';
+const DEFAULT_DUNS='12V606038362';
+/* ===== app settings (persisted on this device) ===== */
+const APP_SETTINGS_KEY='gmscanpro_appsettings_v1';
+let appSettings={duns:DEFAULT_DUNS,serverUrl:'',serverKey:'',serverMode:'off'};
+try{const _s=JSON.parse(localStorage.getItem(APP_SETTINGS_KEY)||'{}');if(_s&&typeof _s==='object')appSettings=Object.assign(appSettings,_s);}catch(e){}
+function saveAppSettings(){try{localStorage.setItem(APP_SETTINGS_KEY,JSON.stringify(appSettings));}catch(e){}}
+function expectedDuns(){return String(appSettings.duns||DEFAULT_DUNS).toUpperCase();}
+function normalizeDunsInput(v){v=String(v||'').trim().toUpperCase().replace(/\s+/g,'');if(/^\d{9}$/.test(v))return '12V'+v;return v;}
+function validDunsFormat(v){return /^12V\d{9}$/.test(v);}
+let lastScanAssemblies=[];
+function deviceId(){try{let id=localStorage.getItem('gmscanpro_device');if(!id){id='dev-'+Math.random().toString(36).slice(2,10)+Date.now().toString(36);localStorage.setItem('gmscanpro_device',id);}return id;}catch(e){return 'dev-unknown';}}
 function toggleExpected(){
     let box = document.getElementById('expectedBox');
     if(document.getElementById('showExpected').checked){
@@ -479,6 +628,7 @@ function showToast(msg,duration=2200){
 }
 function validateAndShow(){
     runVal();
+    refreshServerDupStatus();
     let outEl=document.getElementById('out');
     if(outEl) outEl.scrollIntoView({behavior:'smooth',block:'start'});
 }
@@ -564,7 +714,7 @@ function vp(v) {
     return '';
 }
 function part(v){if(!v||v==='P')return'Part Number Missing - Expected field beginning with P';if(!/^P\d{8}$/.test(v))return'P + 8 digits required';return'';} 
-function duns(v){if(!v||v==='12V')return'DUNS Missing';if(v!==D)return'Expected DUNS '+D;return'';} 
+function duns(v){let D=expectedDuns();if(!v||v==='12V')return'DUNS Missing';if(String(v).toUpperCase()!==D)return'Expected DUNS '+D;return'';} 
 function trace(v,t){if(!v||v==='T'||v==='TY')return'Trace Code Missing - Expected field beginning with T';let x=v.substring(1);if(t==='Final'&&x.length!==16)return'Final Trace length 16 required';if(t==='Converter'&&x.length!==16)return'Converter Trace length 16 required';return'';}
 function lenNoDI(n,v){if(!v)return 0;if(n==='DUNS')return v.length-3;return v.length-1;}
 const fEl=document.getElementById('f'),cEl=document.getElementById('c'),rules=document.getElementById('rules'),scan=document.getElementById('scan'),out=document.getElementById('out');
@@ -623,6 +773,8 @@ function updateHistoryCount(){
     // FIX: element is 'historyBadgeCount'; guard against missing element so validation can never be aborted.
     let badge = document.getElementById('historyBadgeCount') || document.getElementById('historyCount');
     if (badge) badge.textContent = historyRecords.length;
+    let tb = document.getElementById('tabHistoryBadge');
+    if (tb) { tb.textContent = historyRecords.length; tb.style.display = historyRecords.length ? 'flex' : 'none'; }
 }
 
 function playScanFeedback(result) {
@@ -658,10 +810,11 @@ function saveHistory(result,raw,errorReason,assemblies){
     try {
         let fa = assemblies.find(a => a.type === 'Final') || {};
         let sa = assemblies.find(a => a.type === 'Converter') || {};
-        fetch('/api/scan', {
+        fetch(serverApiUrl('/api/scan'), {
             method: 'POST',
-            headers: {'Content-Type': 'application/json'},
+            headers: serverApiHeaders({'Content-Type': 'application/json'}),
             body: JSON.stringify({
+                device: deviceId(),
                 result: result,
                 raw_data: raw,
                 error_reason: errorReason,
@@ -784,6 +937,7 @@ function runVal(){
         };
         assemblies.push(record);
     });
+    lastScanAssemblies=assemblies;
 
     if(errs.length === 0 && document.getElementById('checkDup').checked){
         let duplicateReason = '';
@@ -1747,6 +1901,172 @@ try {
 buildRules();
 updateHistoryCount();
 announceStandalone();
+
+/* ================= APP-LIKE SHELL + SERVER DUPLICATE CHECK ================= */
+function switchTab(name){
+  document.body.dataset.tab=name;
+  document.querySelectorAll('.tabpage').forEach(s=>s.classList.toggle('active',s.id==='tab-'+name));
+  document.querySelectorAll('.tabbar button').forEach(b=>b.classList.toggle('active',b.dataset.tab===name));
+  if(name==='history') renderHistoryTab();
+  try{window.scrollTo({top:0});}catch(e){window.scrollTo(0,0);}
+}
+function historyListHTML(){
+  let last20=historyRecords.slice(-20).reverse();
+  if(!last20.length) return '<div style="text-align:center;padding:32px;color:var(--muted);font-size:.95rem;">No scans yet — validated labels will appear here.</div>';
+  let h='';
+  last20.forEach((rec,idx)=>{
+    let isPass=rec.result==='PASS';
+    h+='<div class="history-item"><div class="history-item-header"><span><b>#'+(historyRecords.length-idx)+'</b> &bull; '+escapeHTML(formatHistoryTime(rec.timestamp))+'</span><span class="'+(isPass?'badge-pass':'badge-fail')+'">'+rec.result+'</span></div>'
+      +(rec.errorReason?'<div class="history-reason">'+escapeHTML(rec.errorReason)+'</div>':'<div style="font-size:.85rem;color:var(--green);font-weight:600;margin-top:4px;">GMW 15862 Compliant &bull; All checks passed</div>')
+      +'<div class="history-raw">'+escapeHTML(rec.rawScanData||'')+'</div></div>';
+  });
+  return h;
+}
+function renderHistoryTab(){ let b=document.getElementById('historyTabBody'); if(b) b.innerHTML=historyListHTML(); }
+
+/* ---------- settings UI ---------- */
+function applySettingsToUI(){
+  let d=document.getElementById('setDuns'); if(d) d.value=expectedDuns();
+  let u=document.getElementById('setSrvUrl'); if(u) u.value=appSettings.serverUrl||'';
+  let k=document.getElementById('setSrvKey'); if(k) k.value=appSettings.serverKey||'';
+  document.querySelectorAll('input[name="srvMode"]').forEach(r=>{r.checked=(r.value===appSettings.serverMode);});
+  syncSrvFields();
+}
+function onDunsInput(){
+  let el=document.getElementById('setDuns'); let err=document.getElementById('dunsErr');
+  if(!el) return;
+  let raw=el.value;
+  let n=normalizeDunsInput(raw);
+  if(validDunsFormat(n)){ appSettings.duns=n; if(el.value!==n) el.value=n; if(err) err.textContent=''; saveAppSettings(); }
+  else { if(err) err.textContent = raw.trim() ? 'Use 12V + 9 digits (e.g. 12V606038362).' : ''; }
+  updateConnPill();
+}
+function onSrvSettingsInput(){
+  let u=document.getElementById('setSrvUrl'), k=document.getElementById('setSrvKey');
+  appSettings.serverUrl=u?u.value.trim():'';
+  appSettings.serverKey=k?k.value:'';
+  saveAppSettings(); updateConnPill();
+  let st=document.getElementById('srvTestStatus');
+  if(st && appSettings.serverUrl){ st.className='srv-status'; st.textContent='Settings saved — tap Test connection to verify.'; }
+}
+function onSrvModeChange(v){ appSettings.serverMode=v; saveAppSettings(); syncSrvFields(); updateConnPill(); }
+function syncSrvFields(){ let f=document.getElementById('srvFields'); if(f) f.style.display=(appSettings.serverMode!=='off')?'block':'none'; }
+function toggleKeyVis(){ let k=document.getElementById('setSrvKey'); if(k) k.type=(k.type==='password'?'text':'password'); }
+function resetAppSettings(){
+  if(!confirm('Reset DUNS and server settings to defaults?')) return;
+  appSettings={duns:DEFAULT_DUNS,serverUrl:'',serverKey:'',serverMode:'off'};
+  saveAppSettings(); applySettingsToUI(); updateConnPill(); showToast('Settings reset.');
+}
+function updateConnPill(state){
+  let p=document.getElementById('connPill'); if(!p) return;
+  let on=appSettings.serverMode!=='off' && !!String(appSettings.serverUrl||'').trim();
+  if(on){
+    if(state==='ok'){ p.className='conn-pill srv ok'; p.textContent='● Server ✓'; }
+    else if(state==='warn'){ p.className='conn-pill warn'; p.textContent='● Server ⚠'; }
+    else { p.className='conn-pill srv'; p.textContent='● Server'; }
+  } else { p.className='conn-pill'; p.textContent='● Local'; }
+}
+// keep a second device tab in sync when settings change elsewhere
+window.addEventListener('storage',(e)=>{
+  if(e.key===APP_SETTINGS_KEY){
+    try{const s=JSON.parse(e.newValue||'{}');
+      if(s&&typeof s==='object'){appSettings=Object.assign({duns:DEFAULT_DUNS,serverUrl:'',serverKey:'',serverMode:'off'},s);applySettingsToUI();updateConnPill();}
+    }catch(err){}
+  }
+});
+
+/* ---------- company server duplicate check ---------- */
+function serverApiUrl(path){
+  let base=String(appSettings.serverUrl||'').trim().replace(/\/+$/,'');
+  if(!base) return path;
+  return base+path;
+}
+function serverApiHeaders(extra){
+  let h=Object.assign({},extra||{});
+  if(appSettings.serverKey) h['X-API-Key']=appSettings.serverKey;
+  return h;
+}
+async function checkServerDuplicates(traces){
+  let base=String(appSettings.serverUrl||'').trim();
+  if(typeof location!=='undefined' && location.protocol==='https:' && /^http:\/\//i.test(base))
+    return {ok:false,error:'mixed-content'};
+  let ctrl=new AbortController(); let timer=setTimeout(()=>ctrl.abort(),6000);
+  try{
+    let r=await fetch(serverApiUrl('/api/duplicates/check'),{
+      method:'POST', headers:serverApiHeaders({'Content-Type':'application/json'}),
+      body:JSON.stringify({traces:traces,device:deviceId(),duns:expectedDuns()}),
+      signal:ctrl.signal
+    });
+    clearTimeout(timer);
+    if(!r.ok) return {ok:false,error:'http-'+r.status};
+    let j=await r.json();
+    let dups=Array.isArray(j.duplicates)?j.duplicates:(Array.isArray(j.duplicate_traces)?j.duplicate_traces:[]);
+    return {ok:true,duplicates:dups.map(String),meta:j};
+  }catch(e){ clearTimeout(timer); return {ok:false,error:(e&&e.name==='AbortError')?'timeout':'unreachable'}; }
+}
+let srvCheckSeq=0, lastSrvCheckRaw='', lastSrvVerdictHTML='';
+async function refreshServerDupStatus(){
+  let host=document.getElementById('out'); if(!host) return;
+  let old=document.getElementById('serverDupStatus'); if(old) old.remove();
+  let box=document.createElement('div'); box.id='serverDupStatus'; host.appendChild(box);
+  let raw=(document.getElementById('scan')||{value:''}).value||'';
+  let traces=(lastScanAssemblies||[]).map(a=>a.trace).filter(Boolean);
+  if(appSettings.serverMode==='off' || !String(appSettings.serverUrl||'').trim() || !traces.length){ box.innerHTML=''; return; }
+  if(raw===lastSrvCheckRaw && lastSrvVerdictHTML){ box.innerHTML=lastSrvVerdictHTML; return; }
+  let my=++srvCheckSeq;
+  box.innerHTML='<span class="srv-chip checking">⟳ Checking company server…</span>';
+  let res=await checkServerDuplicates(traces);
+  if(my!==srvCheckSeq) return;
+  if(!res.ok){
+    let msg = res.error==='mixed-content' ? 'Server URL must use HTTPS — this app runs over HTTPS, so browsers block plain-HTTP.'
+      : res.error==='timeout' ? 'Server timed out — only the on-device check ran.'
+      : res.error && res.error.indexOf('http-')===0 ? 'Server answered with HTTP '+res.error.slice(5)+' — check the URL.'
+      : 'Server unreachable — only the on-device check ran.';
+    lastSrvVerdictHTML='<span class="srv-chip warn">⚠ '+msg+'</span>';
+    box.innerHTML=lastSrvVerdictHTML; updateConnPill('warn'); return;
+  }
+  updateConnPill('ok');
+  let dups=res.duplicates||[];
+  if(dups.length){
+    lastSrvVerdictHTML='<span class="srv-chip dup">⛔ SERVER DUPLICATE: '+dups.map(escapeHTML).join(', ')+'</span>';
+  } else {
+    lastSrvVerdictHTML='<span class="srv-chip ok">✓ Server: no duplicates found</span>';
+  }
+  lastSrvCheckRaw=raw; box.innerHTML=lastSrvVerdictHTML;
+}
+async function testServerConnection(){
+  let st=document.getElementById('srvTestStatus');
+  let base=String(appSettings.serverUrl||'').trim();
+  if(!base){ if(st){st.className='srv-status bad';st.textContent='Enter the server URL first.';} updateConnPill('warn'); return; }
+  if(typeof location!=='undefined' && location.protocol==='https:' && /^http:\/\//i.test(base)){
+    if(st){st.className='srv-status bad';st.textContent='Blocked: this app runs over HTTPS, so the server URL must also be HTTPS (browsers block plain HTTP).';}
+    updateConnPill('warn'); return;
+  }
+  if(st){st.className='srv-status';st.textContent='Testing…';}
+  let ctrl=new AbortController(); let t=setTimeout(()=>ctrl.abort(),7000);
+  try{
+    let r=await fetch(serverApiUrl('/api/health'),{headers:serverApiHeaders({}),signal:ctrl.signal});
+    clearTimeout(t);
+    if(r.ok){
+      let j=null; try{j=await r.json();}catch(e){}
+      if(st){st.className='srv-status ok';st.textContent='✓ Connected to server.'+(j&&j.version?(' Server version '+j.version+'.'):'')+' Duplicate checks will run after each scan.';}
+      updateConnPill('ok');
+    } else {
+      if(st){st.className='srv-status bad';st.textContent='Server answered with HTTP '+r.status+'. Check the URL path.';}
+      updateConnPill('warn');
+    }
+  }catch(e){
+    clearTimeout(t);
+    if(st){st.className='srv-status bad';st.textContent='Could not reach the server. Check the URL, the phone\u2019s Wi-Fi/VPN, and that the server allows this app (CORS).';}
+    updateConnPill('warn');
+  }
+}
+
+/* ---------- init ---------- */
+applySettingsToUI();
+renderHistoryTab();
+updateHistoryCount();
+updateConnPill();
 
 </script>
 </body></html>
