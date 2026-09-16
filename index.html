@@ -344,6 +344,21 @@ if (typeof ZXingWASM !== 'undefined' && ZXingWASM.setZXingModuleOverrides) {
     });
 }
 </script>
+<script>
+// Warm up the decoder engine at page load so the first scan is fast, and record
+// the engine state so failures can tell "engine didn't load" apart from
+// "engine loaded but couldn't read this photo".
+window.__wasmEngineState = 'loading';
+if (typeof ZXingWASM !== 'undefined' && ZXingWASM.readBarcodes) {
+    ZXingWASM.readBarcodes(
+        { width: 4, height: 4, data: new Uint8ClampedArray(64).fill(255) },
+        { formats: ['DataMatrix'], maxNumberOfSymbols: 1 }
+    ).then(() => { window.__wasmEngineState = 'ready'; })
+     .catch(err => { window.__wasmEngineState = 'error: ' + String((err && err.message) || err); });
+} else {
+    window.__wasmEngineState = 'missing-script';
+}
+</script>
 </head><body data-tab="scan"><div class="app">
 <!-- top bar -->
   <div class="topbar">
@@ -1288,9 +1303,19 @@ function startWasmFrameLoop(videoEl) {
     if (liveScanInterval) clearInterval(liveScanInterval);
     if (!wasmVideoCanvas) wasmVideoCanvas = document.createElement('canvas');
     let wasmBusy = false;
+    let wasmWarned = false;
     const loop = () => {
         if (liveScanInterval === null) return; // scanner stopped
-        if (!videoEl || videoEl.readyState !== videoEl.HAVE_ENOUGH_DATA || wasmBusy || typeof ZXingWASM === 'undefined') {
+        if (typeof ZXingWASM === 'undefined' || !ZXingWASM.readBarcodes) {
+            if (!wasmWarned) {
+                wasmWarned = true;
+                window.__wasmEngineState = 'missing-script';
+                document.getElementById('cameraStatus').innerHTML = '<div style="color:var(--red);font-size:0.9rem;">\u26a0\ufe0f Scanner engine didn\'t load &mdash; refresh the page and try again.</div>';
+            }
+            liveScanInterval = setTimeout(loop, 500);
+            return;
+        }
+        if (!videoEl || videoEl.readyState !== videoEl.HAVE_ENOUGH_DATA || wasmBusy) {
             liveScanInterval = setTimeout(loop, 90);
             return;
         }
@@ -1519,6 +1544,7 @@ function handleImageScan(event) {
 function runZXingMultiScaleDecoder(img, file, dataUrl) {
     // ZXing-C++ WebAssembly engine (replaces the old ZXing-JS decoder).
     if (typeof ZXingWASM === 'undefined' || !ZXingWASM.readBarcodes) {
+        window.__wasmEngineState = 'missing-script';
         tryHtml5QrcodeFile(file, dataUrl);
         return;
     }
@@ -1631,6 +1657,7 @@ function tryHtml5QrcodeFile(file, imgUrl) {
     // (name kept for callers) Final fallback: whole image through the WASM
     // engine with extra effort instead of the old html5-qrcode file scan.
     if (typeof ZXingWASM === 'undefined' || !ZXingWASM.readBarcodes) {
+        window.__wasmEngineState = 'missing-script';
         showDecodeFail();
         return;
     }
@@ -1666,10 +1693,22 @@ function tryHtml5QrcodeFile(file, imgUrl) {
 }
 
 function showDecodeFail() {
-    showToast("⚠️ Could not read Data Matrix in photo (try closer photo or good lighting)");
+    let engineState = window.__wasmEngineState || 'unknown';
+    let engineBroken = (engineState === 'missing-script') || (engineState.indexOf('error') === 0);
+    let msg;
+    if (engineState === 'missing-script') {
+        msg = "⚠️ Scanner engine didn't load - refresh the page and try again";
+    } else if (engineState.indexOf('error') === 0) {
+        msg = "⚠️ Scanner engine failed to start - refresh the page and try again";
+    } else {
+        msg = "⚠️ Could not read Data Matrix in photo (try closer photo or good lighting)";
+    }
+    showToast(msg);
     let scanBox = document.getElementById('scan');
     if (scanBox && !scanBox.value) {
-        scanBox.placeholder = "Could not decode photo — try closer/clearer photo or Live Camera";
+        scanBox.placeholder = engineBroken
+            ? "Scanner engine didn't load - refresh the page"
+            : "Could not decode photo — try closer/clearer photo or Live Camera";
     }
 }
 
