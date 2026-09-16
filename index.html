@@ -1318,7 +1318,7 @@ function wasmDecodeImageData(imageData, opts) {
     }
     return ZXingWASM.readBarcodes(imageData, {
         formats: ['DataMatrix', 'Code128'],
-        tryHarder: false,
+        tryHarder: !!opts.harder,
         tryRotate: true,
         tryDenoise: !!opts.denoise,
         maxNumberOfSymbols: 1
@@ -1684,8 +1684,12 @@ function runZXingMultiScaleDecoder(img, file, dataUrl) {
     // every earlier attempt failed.
     [900].forEach(w => {
         tasks.push({ width: w, region: 'label-left-macro', dpm: true });
-        tasks.push({ width: w, region: 'left', dpm: true });
-        tasks.push({ width: w, region: 'full', dpm: true });
+        // Dot-peen marks can sit anywhere in the frame: sweep 4 overlapping
+        // tiles. (The label-oriented 'left'/'full' crops clip the mark or wash
+        // it out under glare, so they are not used for DPM.)
+        for (let ti = 0; ti < 4; ti++) tasks.push({ width: w, region: 'dpm-tile-' + ti, dpm: true });
+        // Last resort: whole frame with maximum effort.
+        tasks.push({ width: w, region: 'full', dpm: true, harder: true });
     });
     // Dot Pin tab: try the dot-peen enhancement FIRST, since it is the expected
     // input there; the paper-label attempts stay as fallback. The Scan tab keeps
@@ -1730,6 +1734,15 @@ function runZXingMultiScaleDecoder(img, file, dataUrl) {
             cropH = Math.round(img.height * 0.50);
             cropX = Math.round(img.width * 0.12);
             cropY = Math.round(img.height * 0.40);
+        } else if (task.region.indexOf('dpm-tile-') === 0) {
+            // 2x2 overlapping tiles (each 2/3 of the frame, 1/3 overlap) so a
+            // dot-peen mark anywhere in the photo lands whole in some tile.
+            const ti = parseInt(task.region.slice(9), 10) || 0;
+            const col = ti % 2, row = Math.floor(ti / 2) % 2;
+            cropW = Math.round(img.width * (0.5 + 1 / 6));
+            cropH = Math.round(img.height * (0.5 + 1 / 6));
+            cropX = Math.round(col * (img.width - cropW));
+            cropY = Math.round(row * (img.height - cropH));
         }
 
         canvas.width = Math.max(100, Math.round(cropW * scale));
@@ -1761,7 +1774,7 @@ function runZXingMultiScaleDecoder(img, file, dataUrl) {
             tryTask(idx + 1);
             return;
         }
-        wasmDecodeImageData(imageData, { denoise: task.denoise || task.dpm }).then(text => {
+        wasmDecodeImageData(imageData, { denoise: task.denoise || task.dpm, harder: task.harder }).then(text => {
             if (text) {
                 onPhotoDecodeSuccess(text);
             } else {
