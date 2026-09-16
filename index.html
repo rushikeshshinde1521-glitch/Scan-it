@@ -282,15 +282,15 @@ td .no{color:var(--red);font-weight:800;}
 .tabpage{display:none;}
 .tabpage.active{display:block;animation:fadeUp .22s ease;}
 @keyframes fadeUp{from{opacity:0;transform:translateY(8px);}to{opacity:1;transform:none;}}
-body[data-tab="scan"]{padding-bottom:186px;}
+body[data-tab="scan"],body[data-tab="dotpin"]{padding-bottom:186px;}
 body[data-tab="history"],body[data-tab="settings"]{padding-bottom:112px;}
-body[data-tab="scan"] .toast{bottom:196px;}
+body[data-tab="scan"] .toast,body[data-tab="dotpin"] .toast{bottom:196px;}
 .bottomdock{position:fixed;left:0;right:0;bottom:0;z-index:60;
   background:rgba(247,249,253,.95);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);
   border-top:1px solid var(--line);padding-bottom:env(safe-area-inset-bottom);}
 .bottomdock .actionbar{position:static;z-index:auto;background:none;backdrop-filter:none;-webkit-backdrop-filter:none;
   padding:10px 16px 4px;display:none;}
-body[data-tab="scan"] .bottomdock .actionbar{display:flex;}
+body[data-tab="scan"] .bottomdock .actionbar,body[data-tab="dotpin"] .bottomdock .actionbar{display:flex;}
 .tabbar{display:flex;gap:4px;padding:6px 8px 8px;}
 .tabbar button{flex:1;border:none;background:none;color:var(--muted);font-weight:700;font-size:.68rem;
   display:flex;flex-direction:column;align-items:center;gap:2px;padding:7px 4px;border-radius:14px;
@@ -380,6 +380,7 @@ if (typeof ZXingWASM !== 'undefined' && ZXingWASM.readBarcodes) {
 
   
   <section id="tab-scan" class="tabpage active">
+  <div id="dpmModeBanner" style="display:none;margin:2px 2px 10px;padding:10px 14px;border-radius:12px;background:linear-gradient(135deg,rgba(34,211,238,.14),rgba(37,99,235,.14));border:1px solid rgba(34,211,238,.45);font-size:.82rem;font-weight:700;color:var(--cyan2);">◉ DOT-PIN MODE — needle-etched marks on metal. For best results use <b>Photo</b> up close, and keep glare off the code.</div>
 <!-- HERO scanner card -->
   <div class="hero">
     <div class="hero-glow"></div>
@@ -389,7 +390,7 @@ if (typeof ZXingWASM !== 'undefined' && ZXingWASM.readBarcodes) {
       <div class="scanline"></div>
       <div class="center-txt">
         <div class="big-ico">▦</div>
-        <div class="cap">READY · Data Matrix / Code 128</div>
+        <div class="cap" id="heroCap">READY · Data Matrix / Code 128</div>
       </div>
     </div>
     <div class="hero-row">
@@ -555,6 +556,7 @@ X-API-Key: (your key, if set)
 </div>
   <nav class="tabbar">
     <button data-tab="scan" class="active" onclick="switchTab('scan')"><span class="ticon"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7V5a2 2 0 0 1 2-2h2M17 3h2a2 2 0 0 1 2 2v2M21 17v2a2 2 0 0 1-2 2h-2M7 21H5a2 2 0 0 1-2-2v-2"/><circle cx="12" cy="12" r="3.2"/></svg></span>Scan</button>
+    <button data-tab="dotpin" onclick="switchTab('dotpin')"><span class="ticon"><svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor"><circle cx="6.5" cy="6.5" r="1.7"/><circle cx="12" cy="6.5" r="1.7"/><circle cx="17.5" cy="6.5" r="1.7"/><circle cx="6.5" cy="12" r="1.7"/><circle cx="17.5" cy="12" r="1.7"/><circle cx="6.5" cy="17.5" r="1.7"/><circle cx="12" cy="17.5" r="1.7"/><circle cx="17.5" cy="17.5" r="1.7"/></svg></span>Dot Pin</button>
     <button data-tab="history" onclick="switchTab('history')"><span class="ticon"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15.5 13.8"/></svg></span>History<span class="tbadge" id="tabHistoryBadge" style="display:none;">0</span></button>
     <button data-tab="settings" onclick="switchTab('settings')"><span class="ticon"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></span>Settings</button>
   </nav>
@@ -926,12 +928,40 @@ function parseContinuous(s,count){
     }
     return out;
 }
+// Dot-peen direct-part marks: one concatenated assembly, no separators, with
+// characters between the fields that the continuous parser glues to the wrong
+// field (e.g. Y9310100000000J1P1272638312V606038362T82262581869F0RL0).
+// Only fires on the DPM shape; every other label keeps its existing parser.
+function parseDPM(s){
+    s=norm(s);
+    if(hasSeparators(s)) return null;
+    const cnt=(re)=>(s.match(re)||[]).length;
+    if(cnt(/Y\d{13}[A-Z]/gi)!==1) return null;
+    if(cnt(/P\d{8}/g)!==1) return null;
+    if(cnt(/12V\d{9}/gi)!==1) return null;
+    if(cnt(/T[A-Z0-9]{16}/gi)!==1) return null;
+    const full=s.match(/^Y\d{13}[A-Z](.*?)P\d{8}(.*?)12V\d{9}(.*?)T[A-Z0-9]{16}$/i);
+    if(!full) return null;
+    if(!full[1]&&!full[2]&&!full[3]) return null; // contiguous: not DPM, old parser handles it
+    const vpps=(s.match(/^Y\d{13}[A-Z]/i)||[])[0];
+    const part=(s.match(/P\d{8}/)||[])[0];
+    const duns=(s.match(/12V\d{9}/i)||[])[0];
+    const trace=(s.match(/T[A-Z0-9]{16}$/i)||[])[0];
+    if(!vpps||!part||!duns||!trace) return null;
+    const pi=s.indexOf(part),di=s.indexOf(duns),ti=s.indexOf(trace);
+    if(!(pi>0&&di>pi&&ti>di)) return null;
+    return {VPPS:vpps.toUpperCase(),Part:part,DUNS:duns.toUpperCase(),Trace:trace.toUpperCase()};
+}
 function runVal(){
     if(+fEl.value > 1000 || +cEl.value > 1000){out.innerHTML ='<div class="fail"><b>FAIL</b><br>Out of Range - Final and Converter values must be between 0 and 1000.</div>';return;}
     let errs=[],rows='',raw=scan.value;let exp=+fEl.value + +cEl.value;
     let h=validateHeader(raw);if(h)errs.push('Header Validation: '+h);
     let arr=[];
-    if(hasSeparators(raw)){
+    let dpmA=parseDPM(raw);
+    if(dpmA){
+        // A dot-peen mark carries exactly one assembly: validate what is there.
+        arr=[dpmA];exp=1;
+    }else if(hasSeparators(raw)){
         arr=parseGSRS(raw);
     }else{
         let p=parseScanditCountDriven(raw,exp);
@@ -1541,6 +1571,75 @@ function handleImageScan(event) {
     reader.readAsDataURL(file);
 }
 
+// DPM (dot-peen / needle-etched metal) helpers. A dot-peen Data Matrix is a
+// grid of separated light dots on dark metal: the binarizer sees dashes, not
+// solid modules, so the finder pattern never locks. Verified fix against a
+// real dot-peen pipe mark: merge the dots with a small box blur, upscale 2x,
+// invert (light dots -> dark), then strong contrast. The C++ engine's built-in
+// tryDenoise alone cannot read this mark. Pure canvas/JS: works in all Safari.
+function boxBlurImageData(imgData, r) {
+    const d = imgData.data, w = imgData.width, h = imgData.height;
+    const tmp = new Uint8ClampedArray(d.length);
+    const n = r * 2 + 1;
+    let x, y, i;
+    for (y = 0; y < h; y++) {
+        let rs = 0, gs = 0, bs = 0;
+        const row = y * w;
+        for (x = -r; x <= r; x++) {
+            const c = x < 0 ? 0 : (x >= w ? w - 1 : x);
+            i = (row + c) * 4; rs += d[i]; gs += d[i+1]; bs += d[i+2];
+        }
+        for (x = 0; x < w; x++) {
+            i = (row + x) * 4;
+            tmp[i] = rs / n; tmp[i+1] = gs / n; tmp[i+2] = bs / n; tmp[i+3] = 255;
+            const xo = x - r < 0 ? 0 : x - r, xi = x + r + 1 >= w ? w - 1 : x + r + 1;
+            const o = (row + xo) * 4, ii = (row + xi) * 4;
+            rs += d[ii] - d[o]; gs += d[ii+1] - d[o+1]; bs += d[ii+2] - d[o+2];
+        }
+    }
+    for (x = 0; x < w; x++) {
+        let rs = 0, gs = 0, bs = 0;
+        for (y = -r; y <= r; y++) {
+            const c = y < 0 ? 0 : (y >= h ? h - 1 : y);
+            i = (c * w + x) * 4; rs += tmp[i]; gs += tmp[i+1]; bs += tmp[i+2];
+        }
+        for (y = 0; y < h; y++) {
+            i = (y * w + x) * 4;
+            d[i] = rs / n; d[i+1] = gs / n; d[i+2] = bs / n;
+            const yo = y - r < 0 ? 0 : y - r, yi = y + r + 1 >= h ? h - 1 : y + r + 1;
+            const o = (yo * w + x) * 4, ii = (yi * w + x) * 4;
+            rs += tmp[ii] - tmp[o]; gs += tmp[ii+1] - tmp[o+1]; bs += tmp[ii+2] - tmp[o+2];
+        }
+    }
+}
+function dpmEnhanceCanvas(canvas) {
+    const w = canvas.width, h = canvas.height;
+    const ctx = canvas.getContext('2d');
+    const id = ctx.getImageData(0, 0, w, h);
+    boxBlurImageData(id, 3);
+    boxBlurImageData(id, 3);
+    ctx.putImageData(id, 0, 0);
+    const big = document.createElement('canvas');
+    big.width = w * 2; big.height = h * 2;
+    const bctx = big.getContext('2d');
+    bctx.imageSmoothingEnabled = true; bctx.imageSmoothingQuality = 'high';
+    bctx.drawImage(canvas, 0, 0, big.width, big.height);
+    const bid = bctx.getImageData(0, 0, big.width, big.height);
+    const d = bid.data, n = d.length, cnt = n / 4;
+    let sum = 0, i;
+    for (i = 0; i < n; i += 4) {
+        const v = 255 - (d[i]*0.299 + d[i+1]*0.587 + d[i+2]*0.114);
+        d[i] = d[i+1] = d[i+2] = v; sum += v;
+    }
+    const mean = sum / cnt;
+    for (i = 0; i < n; i += 4) {
+        const v = mean + 3 * (d[i] - mean);
+        d[i] = d[i+1] = d[i+2] = v < 0 ? 0 : v > 255 ? 255 : v;
+    }
+    bctx.putImageData(bid, 0, 0);
+    return big;
+}
+
 function runZXingMultiScaleDecoder(img, file, dataUrl) {
     // ZXing-C++ WebAssembly engine (replaces the old ZXing-JS decoder).
     if (typeof ZXingWASM === 'undefined' || !ZXingWASM.readBarcodes) {
@@ -1579,6 +1678,21 @@ function runZXingMultiScaleDecoder(img, file, dataUrl) {
         tasks.push({ width: w, region: 'label-left-macro', contrast: false, denoise: true });
         tasks.push({ width: w, region: 'left', contrast: false, denoise: true });
     });
+    // 6. DPM dot-peen, full enhancement (blur + 2x upscale + invert + contrast).
+    // Verified on a real dot-peen pipe mark that steps 1-5 cannot read. Runs
+    // last: printed labels already decoded above, so this costs nothing unless
+    // every earlier attempt failed.
+    [900].forEach(w => {
+        tasks.push({ width: w, region: 'label-left-macro', dpm: true });
+        tasks.push({ width: w, region: 'left', dpm: true });
+        tasks.push({ width: w, region: 'full', dpm: true });
+    });
+    // Dot Pin tab: try the dot-peen enhancement FIRST, since it is the expected
+    // input there; the paper-label attempts stay as fallback. The Scan tab keeps
+    // the label-first order, so label scans are never delayed by DPM work.
+    if (document.body.dataset.scanmode === 'dpm') {
+        tasks = tasks.filter(t => t.dpm).concat(tasks.filter(t => !t.dpm));
+    }
 
     let tryTask = function(idx) {
         if (idx >= tasks.length) {
@@ -1634,6 +1748,12 @@ function runZXingMultiScaleDecoder(img, file, dataUrl) {
                 ctx.putImageData(imgData, 0, 0);
             } catch(e) {}
         }
+        if (task.dpm) {
+            try {
+                canvas = dpmEnhanceCanvas(canvas);
+                ctx = canvas.getContext('2d');
+            } catch(e) {}
+        }
         let imageData;
         try {
             imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
@@ -1641,7 +1761,7 @@ function runZXingMultiScaleDecoder(img, file, dataUrl) {
             tryTask(idx + 1);
             return;
         }
-        wasmDecodeImageData(imageData, { denoise: task.denoise }).then(text => {
+        wasmDecodeImageData(imageData, { denoise: task.denoise || task.dpm }).then(text => {
             if (text) {
                 onPhotoDecodeSuccess(text);
             } else {
@@ -1925,8 +2045,17 @@ announceStandalone();
 /* ================= APP-LIKE SHELL + SERVER DUPLICATE CHECK ================= */
 function switchTab(name){
   document.body.dataset.tab=name;
-  document.querySelectorAll('.tabpage').forEach(s=>s.classList.toggle('active',s.id==='tab-'+name));
+  // The Dot Pin tab reuses the Scan panel (same inputs, parser, validation,
+  // history): only the decode order changes, via body[data-scanmode].
+  const page=(name==='dotpin')?'scan':name;
+  const dpm=(name==='dotpin');
+  document.body.dataset.scanmode=dpm?'dpm':'label';
+  document.querySelectorAll('.tabpage').forEach(s=>s.classList.toggle('active',s.id==='tab-'+page));
   document.querySelectorAll('.tabbar button').forEach(b=>b.classList.toggle('active',b.dataset.tab===name));
+  const banner=document.getElementById('dpmModeBanner');
+  if(banner) banner.style.display=dpm?'block':'none';
+  const cap=document.getElementById('heroCap');
+  if(cap) cap.textContent=dpm?'DOT-PIN · needle-etched metal':'READY · Data Matrix / Code 128';
   if(name==='history') renderHistoryTab();
   try{window.scrollTo({top:0});}catch(e){window.scrollTo(0,0);}
 }
