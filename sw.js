@@ -1,7 +1,7 @@
 /* GM Scan Pro - Service Worker
    Caches the app shell so the PWA works fully offline.
    Bump CACHE_NAME on every release so devices pick up the new files. */
-const CACHE_NAME = 'gm-scan-pro-v13';
+const CACHE_NAME = 'gm-scan-pro-v14';
 const APP_SHELL = [
   './',
   './index.html',
@@ -9,16 +9,16 @@ const APP_SHELL = [
   './icon-192.png',
   './icon-512.png',
   './apple-touch-icon.png',
-  './css/app.css?v=13',
-  './js/engine-boot.js?v=13',
-  './js/config.js?v=13',
-  './js/utils.js?v=13',
-  './js/dpm.js?v=13',
-  './js/parser.js?v=13',
-  './js/scanner.js?v=13',
-  './js/history.js?v=13',
-  './js/settings.js?v=13',
-  './js/ui.js?v=13',
+  './css/app.css?v=14',
+  './js/engine-boot.js?v=14',
+  './js/config.js?v=14',
+  './js/utils.js?v=14',
+  './js/dpm.js?v=14',
+  './js/parser.js?v=14',
+  './js/scanner.js?v=14',
+  './js/history.js?v=14',
+  './js/settings.js?v=14',
+  './js/ui.js?v=14',
   './vendor/zxing_reader.js',
   './vendor/zxing_reader.wasm'
 ];

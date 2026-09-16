@@ -89,10 +89,10 @@ The repo needs **all** of these files (new files since the last deploy are `css/
 - `vendor/` is unchanged — already in the repo
 
 Commit them all, then fully close and reopen the installed PWA on each phone so the
-new service worker (`gm-scan-pro-v13`) takes over.
+new service worker (`gm-scan-pro-v14`) takes over.
 
 Cache-busting: `index.html` references assets with a `?v=N` query string
-(`css/app.css?v=13`, `js/config.js?v=13`, …) and `sw.js` precaches those exact
+(`css/app.css?v=14`, `js/config.js?v=14`, …) and `sw.js` precaches those exact
 URLs. When releasing, bump N in `index.html`, in `sw.js`'s `APP_SHELL`, and in
 `CACHE_NAME` together — this forces every phone to fetch fresh copies even if
 an earlier deploy left a bad entry in its cache.
