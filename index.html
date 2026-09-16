@@ -545,7 +545,7 @@ X-API-Key: (your key, if set)
       <button class="modal-close-btn" onclick="stopCameraScan(true)" aria-label="Close">&times;</button>
     </div>
     <div class="modal-body" style="text-align:center;">
-      <p class="hint" style="margin-top:0;margin-bottom:12px;">Point your camera at the GM Data Matrix or Code 128 label.</p>
+      <p class="hint" style="margin-top:0;margin-bottom:12px;">Point your camera at the GM Data Matrix or Code 128 label.<br>Curved pipe? Move <b>slowly</b> across the curve and keep the code square to the lens — a sharp frame decodes instantly.</p>
       <div id="qr-reader"></div>
       <div id="cameraStatus" style="margin-top:12px;"></div>
       <div class="camtools">
@@ -1278,8 +1278,8 @@ function startNativeLiveVideoScanner() {
     const constraints = {
         video: {
             facingMode: { ideal: currentFacingMode || "environment" },
-            width: { ideal: 1920, min: 1280 },
-            height: { ideal: 1080, min: 720 },
+            width: { ideal: 1280, min: 720 },
+            height: { ideal: 720, min: 480 },
             focusMode: { ideal: "continuous" },
             advanced: [
                 { focusMode: "continuous" },
@@ -1307,9 +1307,22 @@ function startNativeLiveVideoScanner() {
                 }
             }
 
+            // Chained detect loop: a new frame is decoded only after the previous
+            // detect() finished. The old 50ms setInterval stacked overlapping
+            // decodes and thrashed the CPU, which slowed time-to-first-scan.
             if (liveScanInterval) clearInterval(liveScanInterval);
-            liveScanInterval = setInterval(() => {
-                if (!videoEl || videoEl.readyState !== videoEl.HAVE_ENOUGH_DATA) return;
+            let nativeDetectBusy = false;
+            const runNativeDetect = () => {
+                if (liveScanInterval === null) return; // scanner stopped
+                if (!videoEl || videoEl.readyState !== videoEl.HAVE_ENOUGH_DATA || nativeDetectBusy) {
+                    liveScanInterval = setTimeout(runNativeDetect, 90);
+                    return;
+                }
+                nativeDetectBusy = true;
+                const armNext = (delay) => {
+                    nativeDetectBusy = false;
+                    if (liveScanInterval !== null) liveScanInterval = setTimeout(runNativeDetect, delay || 25);
+                };
                 if (nativeBarcodeDetector) {
                     nativeBarcodeDetector.detect(videoEl)
                         .then(barcodes => {
@@ -1318,10 +1331,12 @@ function startNativeLiveVideoScanner() {
                                 if (text) {
                                     stopCameraScan(true);
                                     onPhotoDecodeSuccess(text);
+                                    return;
                                 }
                             }
+                            armNext();
                         })
-                        .catch(() => {});
+                        .catch(() => armNext(90));
                 } else {
                     if (typeof ZXing !== 'undefined') {
                         if (!zxingLiveReader) zxingLiveReader = new ZXing.BrowserMultiFormatReader();
@@ -1331,12 +1346,15 @@ function startNativeLiveVideoScanner() {
                                     if (res && res.text) {
                                         stopCameraScan(true);
                                         onPhotoDecodeSuccess(res.text);
+                                        return;
                                     }
-                                }).catch(()=>{});
-                        } catch(e){}
-                    }
+                                    armNext();
+                                }).catch(()=>armNext(90));
+                        } catch(e){ armNext(90); }
+                    } else { armNext(200); }
                 }
-            }, 50);
+            };
+            liveScanInterval = setTimeout(runNativeDetect, 120);
         })
         .catch(err => {
             startHtml5QrcodeLiveScanner();
@@ -1358,15 +1376,12 @@ function startHtml5QrcodeLiveScanner() {
                     html5QrCode = new Html5Qrcode("qr-reader", {
                         formatsToSupport: [
                             Html5QrcodeSupportedFormats.DATA_MATRIX,
-                            Html5QrcodeSupportedFormats.CODE_128,
-                            Html5QrcodeSupportedFormats.CODE_39,
-                            Html5QrcodeSupportedFormats.QR_CODE,
-                            Html5QrcodeSupportedFormats.PDF_417
+                            Html5QrcodeSupportedFormats.CODE_128
                         ]
                     });
                 }
                 const config = { 
-                    fps: 15, 
+                    fps: 24, 
                     qrbox: function(viewfinderWidth, viewfinderHeight) {
                         let minEdge = Math.min(viewfinderWidth, viewfinderHeight);
                         let size = Math.floor(minEdge * 0.78);
@@ -1375,8 +1390,8 @@ function startHtml5QrcodeLiveScanner() {
                     },
                     videoConstraints: {
                         facingMode: { ideal: currentFacingMode || "environment" },
-                        width: { ideal: 1920, min: 1280 },
-                        height: { ideal: 1080, min: 720 },
+                        width: { ideal: 1280, min: 720 },
+                        height: { ideal: 720, min: 480 },
                         focusMode: { ideal: "continuous" },
                         advanced: [
                             { focusMode: "continuous" },
@@ -1459,7 +1474,7 @@ function handleImageScan(event) {
             if ('BarcodeDetector' in window) {
                 try {
                     let detector = new BarcodeDetector({
-                        formats: ['data_matrix', 'code_128', 'code_39', 'qr_code', 'pdf417']
+                        formats: ['data_matrix', 'code_128']
                     });
                     let barcodes = await detector.detect(img);
                     if (barcodes && barcodes.length > 0) {
@@ -1553,41 +1568,41 @@ function runZXingMultiScaleDecoder(img, file, dataUrl) {
     const hints = new Map();
     const formats = [
         ZXing.BarcodeFormat.DATA_MATRIX,
-        ZXing.BarcodeFormat.CODE_128,
-        ZXing.BarcodeFormat.CODE_39,
-        ZXing.BarcodeFormat.QR_CODE,
-        ZXing.BarcodeFormat.PDF_417
+        ZXing.BarcodeFormat.CODE_128
     ];
     hints.set(ZXing.DecodeHintType.POSSIBLE_FORMATS, formats);
-    hints.set(ZXing.DecodeHintType.TRY_HARDER, true);
+    // TRY_HARDER intentionally off: the multi-crop/multi-scale attempts below already
+    // cover hard cases, and each attempt runs several times faster without it.
     const zxingReader = new ZXing.BrowserMultiFormatReader(hints);
 
     let tasks = [];
-    // 1. Full image at original width, 1500px, 1000px, 800px
-    [img.width, 1500, 1000, 800].forEach(w => {
-        tasks.push({ width: w, region: 'full', contrast: false });
-    });
-    // 2. Center crop (for labels centered in frame)
-    [1500, 1000, 700].forEach(w => {
-        tasks.push({ width: w, region: 'center', contrast: false });
-    });
-    // 3. Left crop & Bottom-Left crop & Macro Left crop (for GM labels where Data Matrix is on the left like WhatsApp Image!)
-    [1200, 800, 600].forEach(w => {
+    // GM labels carry the Data Matrix on the LEFT: try left regions first so the
+    // common case succeeds on the earliest attempts (fastest time-to-scan).
+    // Widths are capped at 1600px: a 12MP phone photo downscaled still resolves
+    // every module, and each attempt runs several times faster than full-res.
+    // 1. Left crops (most likely)
+    [1200, 800].forEach(w => {
         tasks.push({ width: w, region: 'left', contrast: false });
-        tasks.push({ width: w, region: 'bottom-left', contrast: false });
         tasks.push({ width: w, region: 'label-left-macro', contrast: false });
     });
-    // 4. High-contrast thresholded attempts for glare / shadows / JPEG artifacts
-    [1200, 800].forEach(w => {
-        tasks.push({ width: w, region: 'full', contrast: true });
-        tasks.push({ width: w, region: 'left', contrast: true });
-        tasks.push({ width: w, region: 'label-left-macro', contrast: true });
+    // 2. Full image
+    [1600, 1100, 800].forEach(w => {
+        tasks.push({ width: w, region: 'full', contrast: false });
     });
-    // 5. DPM Dot-Peen Needle-Etched Metal Pipe tasks (Morphological closing to bridge needle dots!)
-    [1000, 800].forEach(w => {
+    // 3. Center + bottom-left crops
+    [1100, 750].forEach(w => {
+        tasks.push({ width: w, region: 'center', contrast: false });
+        tasks.push({ width: w, region: 'bottom-left', contrast: false });
+    });
+    // 4. High-contrast thresholded attempts for glare / shadows / JPEG artifacts
+    [1000, 750].forEach(w => {
+        tasks.push({ width: w, region: 'left', contrast: true });
+        tasks.push({ width: w, region: 'full', contrast: true });
+    });
+    // 5. DPM dot-peen (needle-etched curved metal pipe): morphological closing bridges the dots
+    [900, 700].forEach(w => {
         tasks.push({ width: w, region: 'label-left-macro', contrast: false, dotpeen: true });
         tasks.push({ width: w, region: 'left', contrast: false, dotpeen: true });
-        tasks.push({ width: w, region: 'full', contrast: false, dotpeen: true });
     });
 
     let tryTask = function(idx) {
@@ -1671,10 +1686,7 @@ function tryHtml5QrcodeFile(file, imgUrl) {
     if (typeof Html5Qrcode !== 'undefined') {
         const formatsToSupport = [
             Html5QrcodeSupportedFormats.DATA_MATRIX,
-            Html5QrcodeSupportedFormats.CODE_128,
-            Html5QrcodeSupportedFormats.CODE_39,
-            Html5QrcodeSupportedFormats.QR_CODE,
-            Html5QrcodeSupportedFormats.PDF_417
+            Html5QrcodeSupportedFormats.CODE_128
         ];
         const fileScanner = new Html5Qrcode("hidden-file-reader", {
             formatsToSupport: formatsToSupport
