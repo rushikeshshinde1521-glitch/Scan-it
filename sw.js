@@ -1,7 +1,7 @@
 /* GM Scan Pro - Service Worker
    Caches the app shell so the PWA works fully offline.
    Bump CACHE_NAME on every release so devices pick up the new files. */
-const CACHE_NAME = 'gm-scan-pro-v14';
+const CACHE_NAME = 'gm-scan-pro-v15';
 const APP_SHELL = [
   './',
   './index.html',

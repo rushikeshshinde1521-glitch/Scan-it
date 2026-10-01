@@ -13,9 +13,9 @@
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 
 
-<link rel="stylesheet" href="css/app.css?v=14">
+<link rel="stylesheet" href="css/app.css?v=15">
 <script src="vendor/zxing_reader.js"></script>
-<script src="js/engine-boot.js?v=14"></script>
+<script src="js/engine-boot.js?v=15"></script>
 </head>
 <body data-tab="scan"><div class="app">
 <!-- top bar -->
@@ -186,6 +186,14 @@ X-API-Key: (your key, if set)
     </div>
 
     <div class="card">
+      <div class="card-title"><span class="num">◉</span> Dot Pin <small>experimental</small></div>
+      <div class="toggle-row">
+        <div class="toggle-txt"><div class="t">Dot Pin Tab</div><div class="s">Needle-etched metal scanning (not ready to ship)</div></div>
+        <label class="switch"><input type="checkbox" id="setDotPin" onchange="onDotPinToggle()"><span class="track"></span><span class="thumb"></span></label>
+      </div>
+    </div>
+
+    <div class="card">
       <div class="card-title"><span class="num">📱</span> App</div>
       <div class="pwa">
         <span class="pin"><svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><rect x="7" y="2" width="10" height="20" rx="2.5"/><path d="M11 18h2"/><path d="M11 6h2"/></svg></span>
@@ -277,13 +285,13 @@ X-API-Key: (your key, if set)
 </div>
 
 <div id="toast" class="toast"></div>
-<script src="js/config.js?v=14"></script>
-<script src="js/utils.js?v=14"></script>
-<script src="js/dpm.js?v=14"></script>
-<script src="js/parser.js?v=14"></script>
-<script src="js/scanner.js?v=14"></script>
-<script src="js/history.js?v=14"></script>
-<script src="js/settings.js?v=14"></script>
-<script src="js/ui.js?v=14"></script>
+<script src="js/config.js?v=15"></script>
+<script src="js/utils.js?v=15"></script>
+<script src="js/dpm.js?v=15"></script>
+<script src="js/parser.js?v=15"></script>
+<script src="js/scanner.js?v=15"></script>
+<script src="js/history.js?v=15"></script>
+<script src="js/settings.js?v=15"></script>
+<script src="js/ui.js?v=15"></script>
 </body>
 </html>

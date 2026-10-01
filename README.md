@@ -44,8 +44,9 @@ same function names as before.
 
 ## What's in the app (user-facing)
 
-1. **App-like interface** — bottom tab bar: **Scan** | **Dot Pin** | **History** | **Settings**.
+1. **App-like interface** — bottom tab bar: **Scan** | **History** | **Settings**. The **Dot Pin** tab is hidden by default (experimental) — turn it on in Settings → Dot Pin Tab if you need needle-etched metal scanning.
 2. **DUNS is a setting** (Settings tab → DUNS field). The `12V` prefix is hard-coded; you enter just the 9 digits. Default is `606038362`.
+3. **Duplicate check is off by default** — Settings → Duplicate Check → Duplicate Check toggle. Turn it on to flag repeated trace codes against the phone's scan history.
 3. **Company-server duplicate check** (optional) — Settings → Company Server:
    - **Off / Local only** (default): duplicates are caught against the phone's own scan history. Works fully offline.
    - **Local + Server**: on every validation the app also asks your company server "were these trace codes already scanned?" and shows a separate **"Server duplicate"** / **"Server check unavailable"** chip. If the server is unreachable, normal validation still runs — nothing breaks offline.
@@ -89,10 +90,10 @@ The repo needs **all** of these files (new files since the last deploy are `css/
 - `vendor/` is unchanged — already in the repo
 
 Commit them all, then fully close and reopen the installed PWA on each phone so the
-new service worker (`gm-scan-pro-v14`) takes over.
+new service worker (`gm-scan-pro-v15`) takes over.
 
 Cache-busting: `index.html` references assets with a `?v=N` query string
-(`css/app.css?v=14`, `js/config.js?v=14`, …) and `sw.js` precaches those exact
+(`css/app.css?v=15`, `js/config.js?v=15`, …) and `sw.js` precaches those exact
 URLs. When releasing, bump N in `index.html`, in `sw.js`'s `APP_SHELL`, and in
 `CACHE_NAME` together — this forces every phone to fetch fresh copies even if
 an earlier deploy left a bad entry in its cache.
