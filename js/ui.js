@@ -48,21 +48,27 @@ function restorePersistedState(){
   } catch(e){}
   try {
     const st = JSON.parse(localStorage.getItem(SETTINGS_KEY) || '{}');
+    // 2026-10-01: duplicate check now defaults to OFF. One-time reset of any
+    // previously saved ON state so existing installs pick up the new default.
+    if(!st.dupOffMigrated){ st.checkDup=false; st.dupOffMigrated=true; }
     if (typeof st.f === 'number') faCountInput.value = st.f;
     if (typeof st.c === 'number') saCountInput.value = st.c;
     const sh = document.getElementById('showExpected');
     const cd = document.getElementById('checkDup');
     if (sh) sh.checked = !!st.showExpected;
     if (cd) cd.checked = !!st.checkDup;
+    try{ localStorage.setItem(SETTINGS_KEY, JSON.stringify(st)); }catch(e){}
   } catch(e){}
 }
 
 function persistSettings(){
   try {
+    let prev={}; try{ prev=JSON.parse(localStorage.getItem(SETTINGS_KEY)||'{}'); }catch(e){}
     localStorage.setItem(SETTINGS_KEY, JSON.stringify({
       f: +faCountInput.value, c: +saCountInput.value,
       showExpected: !!document.getElementById('showExpected').checked,
-      checkDup: !!document.getElementById('checkDup').checked
+      checkDup: !!document.getElementById('checkDup').checked,
+      dupOffMigrated: !!prev.dupOffMigrated
     }));
   } catch(e){}
 }
@@ -222,5 +228,6 @@ buildExpectedRules();
 updateHistoryCount();
 announceStandalone();
 applySettingsToUI();
+applyDotPinVisibility();
 renderHistoryTab();
 updateConnPill();

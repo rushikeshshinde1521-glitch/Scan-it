@@ -15,7 +15,7 @@ const DEFAULT_DUNS_DIGITS='606038362';
 
 const APP_SETTINGS_KEY='gmscanpro_appsettings_v1';
 
-let appSettings={duns:DEFAULT_DUNS_DIGITS,serverUrl:'',serverKey:'',serverMode:'off'};
+let appSettings={duns:DEFAULT_DUNS_DIGITS,serverUrl:'',serverKey:'',serverMode:'off',dotPin:false};
 
 try{const _s=JSON.parse(localStorage.getItem(APP_SETTINGS_KEY)||'{}');if(_s&&typeof _s==='object')appSettings=Object.assign(appSettings,_s);}catch(e){}
 /* Migrate installs that stored the old full "12Vxxxxxxxxx" form: keep just the 9 digits. */

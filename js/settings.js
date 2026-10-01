@@ -13,6 +13,7 @@ function applySettingsToUI(){
   let u=document.getElementById('setSrvUrl'); if(u) u.value=appSettings.serverUrl||'';
   let k=document.getElementById('setSrvKey'); if(k) k.value=appSettings.serverKey||'';
   document.querySelectorAll('input[name="srvMode"]').forEach(r=>{r.checked=(r.value===appSettings.serverMode);});
+  let dp=document.getElementById('setDotPin'); if(dp) dp.checked=!!appSettings.dotPin;
   syncSrvFields();
 }
 
@@ -37,14 +38,29 @@ function onSrvSettingsInput(){
 
 function onSrvModeChange(v){ appSettings.serverMode=v; saveAppSettings(); syncSrvFields(); updateConnPill(); }
 
+/* ---------- Dot Pin tab toggle (experimental — off by default) ---------- */
+
+function onDotPinToggle(){
+  let t=document.getElementById('setDotPin');
+  appSettings.dotPin=!!(t&&t.checked);
+  saveAppSettings(); applyDotPinVisibility();
+}
+
+function applyDotPinVisibility(){
+  let btn=document.querySelector('.tabbar button[data-tab="dotpin"]');
+  if(btn) btn.style.display=appSettings.dotPin?'':'none';
+  // If the tab was open while it got disabled, fall back to Scan.
+  if(!appSettings.dotPin && document.body.dataset.tab==='dotpin' && typeof switchTab==='function') switchTab('scan');
+}
+
 function syncSrvFields(){ let f=document.getElementById('srvFields'); if(f) f.style.display=(appSettings.serverMode!=='off')?'block':'none'; }
 
 function toggleKeyVis(){ let k=document.getElementById('setSrvKey'); if(k) k.type=(k.type==='password'?'text':'password'); }
 
 function resetAppSettings(){
   if(!confirm('Reset DUNS and server settings to defaults?')) return;
-  appSettings={duns:DEFAULT_DUNS_DIGITS,serverUrl:'',serverKey:'',serverMode:'off'};
-  saveAppSettings(); applySettingsToUI(); updateConnPill(); showToast('Settings reset.');
+  appSettings={duns:DEFAULT_DUNS_DIGITS,serverUrl:'',serverKey:'',serverMode:'off',dotPin:false};
+  saveAppSettings(); applySettingsToUI(); applyDotPinVisibility(); updateConnPill(); showToast('Settings reset.');
 }
 
 function updateConnPill(state){
@@ -61,7 +77,7 @@ function updateConnPill(state){
 window.addEventListener('storage',(e)=>{
   if(e.key===APP_SETTINGS_KEY){
     try{const s=JSON.parse(e.newValue||'{}');
-      if(s&&typeof s==='object'){appSettings=Object.assign({duns:DEFAULT_DUNS_DIGITS,serverUrl:'',serverKey:'',serverMode:'off'},s);if(/^12V\d{9}$/i.test(String(appSettings.duns||'')))appSettings.duns=String(appSettings.duns).slice(3).toUpperCase();applySettingsToUI();updateConnPill();}
+      if(s&&typeof s==='object'){appSettings=Object.assign({duns:DEFAULT_DUNS_DIGITS,serverUrl:'',serverKey:'',serverMode:'off',dotPin:false},s);if(/^12V\d{9}$/i.test(String(appSettings.duns||'')))appSettings.duns=String(appSettings.duns).slice(3).toUpperCase();applySettingsToUI();applyDotPinVisibility();updateConnPill();}
     }catch(err){}
   }
 });
