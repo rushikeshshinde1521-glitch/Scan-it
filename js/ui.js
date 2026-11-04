@@ -202,6 +202,24 @@ try {
 } catch(e){}
 
 /* ================= APP-LIKE SHELL + SERVER DUPLICATE CHECK ================= */
+/* v16: verdict takeover — #out moves into the fullscreen modal on validate,
+   moves back to its home slot on close. */
+function closeVerdict(next){
+  let modal=document.getElementById('verdictModal');
+  let outEl=document.getElementById('out');
+  let home=document.getElementById('outHome');
+  if(modal) modal.classList.remove('open');
+  if(outEl && home && outEl.parentNode!==home) home.appendChild(outEl);
+  if(next){
+    if(typeof clearScan==='function') clearScan();
+    // v16.5 multi-scan loop: verdict -> camera with ONE tap.
+    // Click >> PASS >> click >> PASS >> click >> FAIL >> click >> PASS
+    if(typeof getScanMode==='function' && getScanMode()==='multi' && typeof startCameraScan==='function'){
+      setTimeout(function(){ startCameraScan(); }, 200);
+    }
+  }
+}
+
 function switchTab(name){
   document.body.dataset.tab=name;
   // The Dot Pin tab reuses the Scan panel (same inputs, parser, validation,
@@ -230,4 +248,31 @@ announceStandalone();
 applySettingsToUI();
 applyDotPinVisibility();
 renderHistoryTab();
+if(typeof renderRecent==='function') renderRecent();
+if(typeof setupAutoUpdate==='function') setupAutoUpdate();
 updateConnPill();
+
+/* v16.4: auto-update — the home-screen app checks for a new version on launch
+   and when returning to foreground. No more close/reopen dance: when an update
+   is ready, a banner appears; one tap reloads into the new version. */
+function setupAutoUpdate(){
+  if(!('serviceWorker' in navigator)) return;
+  let banner=document.getElementById('updateBanner');
+  let btn=document.getElementById('updateBtn');
+  if(btn) btn.onclick=function(){ window.location.reload(); };
+  navigator.serviceWorker.getRegistration('./sw.js').then(function(reg){
+    if(!reg) return;
+    reg.addEventListener('updatefound',function(){
+      let nw=reg.installing;
+      if(!nw) return;
+      nw.addEventListener('statechange',function(){
+        if(nw.state==='installed' && navigator.serviceWorker.controller){
+          if(banner) banner.classList.add('show');
+        }
+      });
+    });
+    let check=function(){ try{ reg.update(); }catch(e){} };
+    check();
+    document.addEventListener('visibilitychange',function(){ if(!document.hidden) check(); });
+  }).catch(function(){});
+}
