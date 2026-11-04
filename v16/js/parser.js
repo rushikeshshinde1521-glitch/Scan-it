@@ -248,9 +248,9 @@ function runLabelValidation(){
     if (getScanMode() === 'multi') {
         let fa = assemblies.find(a => a.type === 'Final') || {};
         if (errs.length === 0) {
-            resultBox.innerHTML = `<div class="pass" style="padding:22px 16px;border-radius:20px;text-align:center;box-shadow:0 4px 12px rgba(30,126,52,0.25);margin-bottom:10px;">
-                <div style="font-size:1.7rem;font-weight:900;margin-bottom:8px;">✓ PASS</div>
-                <div style="font-size:1.15rem;font-weight:800;letter-spacing:.02em;">Trace: ${fa.trace || 'N/A'}</div>
+            resultBox.innerHTML = `<div class="pass" style="padding:36px 18px;border-radius:20px;text-align:center;box-shadow:0 4px 12px rgba(30,126,52,0.25);margin-bottom:10px;min-height:38vh;display:flex;flex-direction:column;justify-content:center;">
+                <div style="font-size:2rem;font-weight:900;margin-bottom:14px;">✓ PASS</div>
+                <div style="font-size:1.65rem;font-weight:800;font-family:ui-monospace,Menlo,Consolas,monospace;word-break:break-all;line-height:1.5;letter-spacing:.02em;">${fa.trace || 'N/A'}</div>
             </div>` + manualMatchHtml;
         } else {
             resultBox.innerHTML = `<div class="fail" style="padding:22px 16px;border-radius:20px;text-align:center;box-shadow:0 4px 12px rgba(203,36,49,0.25);margin-bottom:10px;">
