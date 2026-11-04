@@ -36,7 +36,9 @@ self.addEventListener('activate', (event) => {
   event.waitUntil(
     caches.keys()
       .then((keys) => Promise.all(keys.map((k) => {
-        if (k !== CACHE_NAME) return caches.delete(k);
+        // 2026-11-03: only delete OUR OWN old caches — never touch v16's cache
+        // (the v16 test build shares this origin; the workers must coexist).
+        if (k !== CACHE_NAME && k.indexOf('gm-scan-pro-v15') === 0) return caches.delete(k);
       })))
       .then(() => self.clients.claim())
   );
