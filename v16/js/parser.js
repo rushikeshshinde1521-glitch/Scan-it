@@ -248,9 +248,22 @@ function runLabelValidation(){
     if (getScanMode() === 'multi') {
         let fa = assemblies.find(a => a.type === 'Final') || {};
         if (errs.length === 0) {
-            resultBox.innerHTML = `<div class="pass" style="padding:36px 18px;border-radius:20px;text-align:center;box-shadow:0 4px 12px rgba(30,126,52,0.25);margin-bottom:10px;min-height:38vh;display:flex;flex-direction:column;justify-content:center;">
-                <div style="font-size:2rem;font-weight:900;margin-bottom:14px;">✓ PASS</div>
-                <div style="font-size:1.65rem;font-weight:800;font-family:ui-monospace,Menlo,Consolas,monospace;word-break:break-all;line-height:1.5;letter-spacing:.02em;">${fa.trace || 'N/A'}</div>
+            // v16.8: full scan data — every assembly with all fields, scrollable
+            let fullHtml = assemblies.map((a,i)=>{
+                let lbl = a.type==='Final' ? 'Final Assembly' : ('Converter '+(i-(+faCountInput.value)+1));
+                return `<div style="background:#fff;border:1px solid rgba(0,0,0,.08);border-radius:12px;padding:10px 12px;margin-top:8px;text-align:left;">`+
+                `<div style="font-size:.72rem;font-weight:800;color:#6b7280;letter-spacing:.06em;margin-bottom:6px;">${lbl.toUpperCase()}</div>`+
+                `<div style="font-size:.82rem;line-height:1.7;font-family:ui-monospace,Menlo,Consolas,monospace;word-break:break-all;">`+
+                `<div>Part&nbsp;&nbsp;${a.part||'—'}</div>`+
+                `<div>Trace&nbsp;${a.trace||'—'}</div>`+
+                `<div>VPPS&nbsp;&nbsp;${a.vpps||'—'}</div>`+
+                `<div>DUNS&nbsp;&nbsp;${a.duns||'—'}</div>`+
+                `</div></div>`;
+            }).join('');
+            resultBox.innerHTML = `<div class="pass" style="padding:28px 16px 20px;border-radius:20px;text-align:center;box-shadow:0 4px 12px rgba(30,126,52,0.25);margin-bottom:10px;">
+                <div style="font-size:2rem;font-weight:900;margin-bottom:12px;">✓ PASS</div>
+                <div style="font-size:1.6rem;font-weight:800;font-family:ui-monospace,Menlo,Consolas,monospace;word-break:break-all;line-height:1.5;letter-spacing:.02em;margin-bottom:6px;">${fa.trace || 'N/A'}</div>
+                <div style="max-height:32vh;overflow-y:auto;margin-top:8px;">${fullHtml}</div>
             </div>` + manualMatchHtml;
         } else {
             resultBox.innerHTML = `<div class="fail" style="padding:22px 16px;border-radius:20px;text-align:center;box-shadow:0 4px 12px rgba(203,36,49,0.25);margin-bottom:10px;">
