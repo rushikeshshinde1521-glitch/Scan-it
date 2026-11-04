@@ -13,9 +13,9 @@
 <link rel="apple-touch-icon" href="../apple-touch-icon.png">
 
 
-<link rel="stylesheet" href="css/app.css?v=17">
+<link rel="stylesheet" href="css/app.css?v=18">
 <script src="vendor/zxing_reader.js"></script>
-<script src="js/engine-boot.js?v=17"></script>
+<script src="js/engine-boot.js?v=18"></script>
 </head>
 <body data-tab="scan"><div class="app">
 <!-- top bar -->
@@ -45,19 +45,18 @@
     <label><input type="radio" name="scanMode" id="modeMulti" value="multi"><span>⚡ Multi-Scan</span></label>
   </div>
 
-  <div class="hero-row" style="margin-top:12px;">
-    <button class="btn-secondary" onclick="triggerPhotoScan()"><span class="i"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="4"/><circle cx="8.5" cy="8.5" r="1.6"/><path d="M20.5 16.5 15.6 11.6a1.5 1.5 0 0 0-2.12 0L6 19"/></svg></span>Photo</button>
-    <button class="btn-secondary" onclick="pasteFromClipboard()"><span class="i"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><rect x="8" y="2" width="8" height="4" rx="1"/><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1 2-2H6a2 2 0 0 1 2-2h2"/><path d="M9 12h6M9 16h6"/></svg></span>Paste</button>
-  </div>
-
-  <!-- Scan input -->
-  <div class="card">
-    <div class="card-title"><span class="num">▦</span> Scan Data <small>paste or auto-loaded</small></div>
-    <textarea id="scan" onpaste="handleTouchScreenPaste(event)" oninput="handleScanInput(event)" placeholder="Paste scan data here…"></textarea>
-    <div class="row2">
-      <button class="btn-primary" onclick="validateAndShow()">Validate</button>
-      <button class="btn-ghost" onclick="clearScan()">Clear</button>
+  <!-- Main scan card (v16.2: app-like, camera-first) -->
+  <div class="card scan-card">
+    <div class="hero-row">
+      <button class="btn-secondary" onclick="triggerPhotoScan()"><span class="i"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="4"/><circle cx="8.5" cy="8.5" r="1.6"/><path d="M20.5 16.5 15.6 11.6a1.5 1.5 0 0 0-2.12 0L6 19"/></svg></span>Photo</button>
+      <button class="btn-secondary" onclick="pasteFromClipboard()"><span class="i"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><rect x="8" y="2" width="8" height="4" rx="1"/><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1 2-2H6a2 2 0 0 1 2-2h2"/><path d="M9 12h6M9 16h6"/></svg></span>Paste</button>
     </div>
+    <details class="manual-entry">
+      <summary>Type or paste scan data</summary>
+      <textarea id="scan" onpaste="handleTouchScreenPaste(event)" oninput="handleScanInput(event)" placeholder="Paste scan data here…"></textarea>
+      <div class="row2"><button class="btn-ghost" onclick="clearScan()">Clear</button></div>
+    </details>
+    <button class="btn-primary btn-block" onclick="validateAndShow()">Validate</button>
   </div>
 
   <!-- Options: scan mode + assembly counts, collapsed by default -->
@@ -89,9 +88,13 @@
   <!-- RESULTS (verdict shows fullscreen; #out rests here when idle) -->
   <div id="outHome"><div id="out"></div></div>
 
-  <div class="row2">
-    <button class="btn-ghost" onclick="resetAll()">Reset Form</button>
+  <!-- Recent scans (v16.2: fills the screen like a real app) -->
+  <div class="card recent-card">
+    <div class="card-title"><span class="num">◷</span> Recent <small>this device</small></div>
+    <div id="recentList" class="recent-list"></div>
   </div>
+
+  <button class="link-btn" onclick="resetAll()">Reset form</button>
   </section>
 
   <section id="tab-history" class="tabpage">
@@ -276,13 +279,13 @@ X-API-Key: (your key, if set)
 </div>
 
 <div id="toast" class="toast"></div>
-<script src="js/config.js?v=17"></script>
-<script src="js/utils.js?v=17"></script>
-<script src="js/dpm.js?v=17"></script>
-<script src="js/parser.js?v=17"></script>
-<script src="js/scanner.js?v=17"></script>
-<script src="js/history.js?v=17"></script>
-<script src="js/settings.js?v=17"></script>
-<script src="js/ui.js?v=17"></script>
+<script src="js/config.js?v=18"></script>
+<script src="js/utils.js?v=18"></script>
+<script src="js/dpm.js?v=18"></script>
+<script src="js/parser.js?v=18"></script>
+<script src="js/scanner.js?v=18"></script>
+<script src="js/history.js?v=18"></script>
+<script src="js/settings.js?v=18"></script>
+<script src="js/ui.js?v=18"></script>
 </body>
 </html>
