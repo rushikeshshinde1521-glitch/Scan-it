@@ -1,3 +1,10 @@
+# GM Scan Pro v17 — production
+
+> **Production build** (shopfloor). Red + black theme, Instagram-style centered
+> camera button, auto-update via in-app banner (no reinstall needed).
+> Parser and validation engine unchanged from v15.
+
+
 # GM Scan Pro — app source (refactored for IT handoff)
 
 Barcode / DataMatrix label validator PWA for GMW 15862. This refactor splits the
@@ -90,10 +97,10 @@ The repo needs **all** of these files (new files since the last deploy are `css/
 - `vendor/` is unchanged — already in the repo
 
 Commit them all, then fully close and reopen the installed PWA on each phone so the
-new service worker (`gm-scan-pro-v15`) takes over.
+new service worker (`gm-scan-pro-v17`) takes over.
 
 Cache-busting: `index.html` references assets with a `?v=N` query string
-(`css/app.css?v=15`, `js/config.js?v=15`, …) and `sw.js` precaches those exact
+(`css/app.css?v=25`, `js/config.js?v=25`, …) and `sw.js` precaches those exact
 URLs. When releasing, bump N in `index.html`, in `sw.js`'s `APP_SHELL`, and in
 `CACHE_NAME` together — this forces every phone to fetch fresh copies even if
 an earlier deploy left a bad entry in its cache.
