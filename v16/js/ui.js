@@ -210,7 +210,14 @@ function closeVerdict(next){
   let home=document.getElementById('outHome');
   if(modal) modal.classList.remove('open');
   if(outEl && home && outEl.parentNode!==home) home.appendChild(outEl);
-  if(next && typeof clearScan==='function') clearScan();
+  if(next){
+    if(typeof clearScan==='function') clearScan();
+    // v16.5 multi-scan loop: verdict -> camera with ONE tap.
+    // Click >> PASS >> click >> PASS >> click >> FAIL >> click >> PASS
+    if(typeof getScanMode==='function' && getScanMode()==='multi' && typeof startCameraScan==='function'){
+      setTimeout(function(){ startCameraScan(); }, 200);
+    }
+  }
 }
 
 function switchTab(name){
