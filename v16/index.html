@@ -13,11 +13,13 @@
 <link rel="apple-touch-icon" href="../apple-touch-icon.png">
 
 
-<link rel="stylesheet" href="css/app.css?v=19">
+<link rel="stylesheet" href="css/app.css?v=20">
 <script src="vendor/zxing_reader.js"></script>
-<script src="js/engine-boot.js?v=19"></script>
+<script src="js/engine-boot.js?v=20"></script>
 </head>
-<body data-tab="scan"><div class="app">
+<body data-tab="scan">
+<div class="update-banner" id="updateBanner"><span>New version available</span><button id="updateBtn">Update</button></div>
+<div class="app">
 <!-- top bar -->
   <div class="topbar">
     <div class="brand">
@@ -94,7 +96,7 @@
     <div id="recentList" class="recent-list"></div>
   </div>
 
-  <button class="link-btn" onclick="resetAll()">Reset form</button>
+  <button class="btn-secondary btn-block" onclick="resetAll()">Reset</button>
   </section>
 
   <section id="tab-history" class="tabpage">
@@ -279,13 +281,13 @@ X-API-Key: (your key, if set)
 </div>
 
 <div id="toast" class="toast"></div>
-<script src="js/config.js?v=19"></script>
-<script src="js/utils.js?v=19"></script>
-<script src="js/dpm.js?v=19"></script>
-<script src="js/parser.js?v=19"></script>
-<script src="js/scanner.js?v=19"></script>
-<script src="js/history.js?v=19"></script>
-<script src="js/settings.js?v=19"></script>
-<script src="js/ui.js?v=19"></script>
+<script src="js/config.js?v=20"></script>
+<script src="js/utils.js?v=20"></script>
+<script src="js/dpm.js?v=20"></script>
+<script src="js/parser.js?v=20"></script>
+<script src="js/scanner.js?v=20"></script>
+<script src="js/history.js?v=20"></script>
+<script src="js/settings.js?v=20"></script>
+<script src="js/ui.js?v=20"></script>
 </body>
 </html>
