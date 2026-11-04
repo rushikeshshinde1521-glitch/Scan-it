@@ -13,9 +13,9 @@
 <link rel="apple-touch-icon" href="../apple-touch-icon.png">
 
 
-<link rel="stylesheet" href="css/app.css?v=18">
+<link rel="stylesheet" href="css/app.css?v=19">
 <script src="vendor/zxing_reader.js"></script>
-<script src="js/engine-boot.js?v=18"></script>
+<script src="js/engine-boot.js?v=19"></script>
 </head>
 <body data-tab="scan"><div class="app">
 <!-- top bar -->
@@ -61,12 +61,12 @@
 
   <!-- Options: scan mode + assembly counts, collapsed by default -->
   <details class="card opts">
-    <summary class="opts-summary"><span class="num">⚙</span> Counts <small>FA + SA</small><span class="opts-chev">▾</span></summary>
+    <summary class="opts-summary"><span class="num">⚙</span> Assemblies <small>final + converters</small><span class="opts-chev">▾</span></summary>
     <div class="opts-body">
-      <div class="card-title"><span class="num">1</span> Assembly Counts <small>FA + SA</small></div>
+      <div class="card-title"><span class="num">1</span> Assemblies <small>how many of each</small></div>
       <div class="counts">
         <div class="count">
-          <div class="lbl">FA · FINAL</div>
+          <div class="lbl">Final Assembly</div>
           <div class="stepper">
             <button type="button" onclick="stepVal('f',-1)">−</button>
             <input id="f" type="number" inputmode="numeric" value="1" min="0" max="1000" onchange="buildExpectedRules()">
@@ -74,7 +74,7 @@
           </div>
         </div>
         <div class="count">
-          <div class="lbl">SA · SUB-ASSEMBLY</div>
+          <div class="lbl">Converters</div>
           <div class="stepper">
             <button type="button" onclick="stepVal('c',-1)">−</button>
             <input id="c" type="number" inputmode="numeric" value="1" min="0" max="1000" onchange="buildExpectedRules()">
@@ -279,13 +279,13 @@ X-API-Key: (your key, if set)
 </div>
 
 <div id="toast" class="toast"></div>
-<script src="js/config.js?v=18"></script>
-<script src="js/utils.js?v=18"></script>
-<script src="js/dpm.js?v=18"></script>
-<script src="js/parser.js?v=18"></script>
-<script src="js/scanner.js?v=18"></script>
-<script src="js/history.js?v=18"></script>
-<script src="js/settings.js?v=18"></script>
-<script src="js/ui.js?v=18"></script>
+<script src="js/config.js?v=19"></script>
+<script src="js/utils.js?v=19"></script>
+<script src="js/dpm.js?v=19"></script>
+<script src="js/parser.js?v=19"></script>
+<script src="js/scanner.js?v=19"></script>
+<script src="js/history.js?v=19"></script>
+<script src="js/settings.js?v=19"></script>
+<script src="js/ui.js?v=19"></script>
 </body>
 </html>
