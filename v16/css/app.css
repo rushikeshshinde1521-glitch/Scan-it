@@ -406,3 +406,20 @@ details.opts[open] .opts-chev{transform:rotate(180deg);}
 /* v16: single bottom bar (tabbar only) — actionbar removed */
 body[data-tab="scan"],body[data-tab="dotpin"]{padding-bottom:112px;}
 body[data-tab="scan"] .toast,body[data-tab="dotpin"] .toast{bottom:122px;}
+
+/* v16.1: Instagram-style centered camera button in the tab bar */
+.tabbar{align-items:flex-end;}
+.tabbar .tab-camera{
+  flex:0 0 auto;width:62px;height:62px;border-radius:50%;border:3px solid #fff;
+  cursor:pointer;color:#fff;font-size:inherit;font-weight:inherit;
+  background:linear-gradient(135deg,#22d3ee,#2563eb);
+  display:flex;align-items:center;justify-content:center;flex-direction:row;
+  margin:-26px 6px 2px;padding:0;gap:0;position:relative;
+  box-shadow:0 8px 24px rgba(37,99,235,.42);
+  transition:transform .08s ease;
+}
+.tabbar .tab-camera:active{transform:scale(.93);}
+.tabbar button[data-tab]{flex:1;}
+
+/* v16.1: visible scan-mode segmented control */
+.mode-seg{margin:2px 2px 0;}
