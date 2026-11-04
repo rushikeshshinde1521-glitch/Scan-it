@@ -323,3 +323,241 @@ body[data-tab="scan"] .bottomdock .actionbar,body[data-tab="dotpin"] .bottomdock
 .srv-chip.warn{background:#fff7e6;color:#b97a0a;border:1px solid rgba(232,160,10,.4);}
 .history-list{margin-top:4px;}
 .seg .soff{font-size:.72rem;color:var(--muted);font-weight:600;}
+
+/* ==========================================================================
+ * v16 redesign: unified button system + camera-first scan + verdict takeover
+ * --------------------------------------------------------------------------
+ * One button language across the app (Meta-style consistency):
+ *   .btn-primary   — the one main action on screen (blue gradient)
+ *   .btn-secondary — supporting actions (outlined)
+ *   .btn-ghost     — quiet actions (text only)
+ *   .btn-block     — full-width
+ * ========================================================================== */
+
+.btn-primary,.btn-secondary,.btn-ghost{
+  font-family:inherit;cursor:pointer;border-radius:16px;font-weight:800;
+  display:inline-flex;align-items:center;justify-content:center;gap:8px;
+  min-height:52px;padding:12px 20px;font-size:.95rem;
+  transition:transform .08s ease, box-shadow .15s ease;
+  -webkit-tap-highlight-color:transparent;
+}
+.btn-primary:active,.btn-secondary:active,.btn-ghost:active{transform:scale(.97);}
+.btn-primary{
+  border:none;color:#fff;
+  background:linear-gradient(135deg,#22d3ee,#2563eb);
+  box-shadow:0 8px 22px rgba(37,99,235,.32);
+}
+.btn-secondary{
+  border:1.5px solid var(--line);background:#fff;color:var(--txt);
+  box-shadow:0 2px 8px rgba(23,43,99,.06);flex:1;
+}
+.btn-secondary .i{display:inline-flex;}
+.btn-ghost{border:none;background:none;color:var(--cyan2);box-shadow:none;min-height:44px;}
+.btn-block{width:100%;margin-top:10px;}
+
+/* Camera-first hero: one big SCAN LABEL button */
+.scan-hero-btn{
+  position:relative;width:100%;border:none;cursor:pointer;
+  border-radius:24px;padding:34px 20px 30px;
+  background:linear-gradient(160deg,#0e2a52,#134a8f 55%,#0e63b6);
+  color:#fff;font-family:inherit;overflow:hidden;
+  box-shadow:0 14px 34px rgba(14,80,160,.38);
+  display:flex;flex-direction:column;align-items:center;gap:6px;
+  transition:transform .08s ease;
+}
+.scan-hero-btn:active{transform:scale(.98);}
+.scan-hero-btn .corner{position:absolute;width:26px;height:26px;border:3px solid rgba(255,255,255,.85);border-radius:6px;}
+.scan-hero-btn .corner.tl{top:14px;left:14px;border-right:none;border-bottom:none;}
+.scan-hero-btn .corner.tr{top:14px;right:14px;border-left:none;border-bottom:none;}
+.scan-hero-btn .corner.bl{bottom:14px;left:14px;border-right:none;border-top:none;}
+.scan-hero-btn .corner.br{bottom:14px;right:14px;border-left:none;border-top:none;}
+.scan-hero-ico{display:flex;color:#fff;opacity:.95;}
+.scan-hero-txt{font-size:1.5rem;font-weight:900;letter-spacing:.12em;}
+.scan-hero-sub{font-size:.82rem;font-weight:600;opacity:.75;}
+.hero .hero-row{display:flex;gap:10px;margin-top:12px;}
+
+/* Options disclosure */
+details.opts{padding:0;}
+details.opts summary{list-style:none;cursor:pointer;}
+details.opts summary::-webkit-details-marker{display:none;}
+.opts-summary{display:flex;align-items:center;gap:8px;padding:16px;font-weight:800;font-size:.95rem;}
+.opts-summary .num{display:inline-flex;align-items:center;justify-content:center;width:26px;height:26px;border-radius:9px;background:linear-gradient(135deg,rgba(34,211,238,.18),rgba(37,99,235,.18));font-size:.85rem;}
+.opts-summary small{color:var(--muted);font-weight:600;font-size:.75rem;}
+.opts-chev{margin-left:auto;color:var(--muted);transition:transform .2s;}
+details.opts[open] .opts-chev{transform:rotate(180deg);}
+.opts-body{padding:0 16px 16px;}
+
+/* Verdict takeover: fullscreen PASS/FAIL moment */
+.verdict-overlay{
+  position:fixed;inset:0;z-index:2500;display:none;
+  background:rgba(15,25,48,.55);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);
+  align-items:flex-end;justify-content:center;padding:0;
+}
+.verdict-overlay.open{display:flex;animation:fadeUp .22s ease;}
+.verdict-sheet{
+  width:100%;max-width:560px;max-height:92vh;overflow-y:auto;
+  background:linear-gradient(170deg,#ffffff,#f4f7fd);
+  border-radius:26px 26px 0 0;padding:20px 18px calc(20px + env(safe-area-inset-bottom));
+  box-shadow:0 -12px 40px rgba(15,25,48,.25);
+}
+.verdict-sheet #out .pass,.verdict-sheet #out .fail{margin-bottom:6px;}
+#outHome{min-height:0;}
+
+/* v16: single bottom bar (tabbar only) — actionbar removed */
+body[data-tab="scan"],body[data-tab="dotpin"]{padding-bottom:112px;}
+body[data-tab="scan"] .toast,body[data-tab="dotpin"] .toast{bottom:122px;}
+
+/* v16.1: Instagram-style centered camera button in the tab bar */
+.tabbar{align-items:flex-end;}
+.tabbar .tab-camera{
+  flex:0 0 auto;width:62px;height:62px;border-radius:50%;border:3px solid #fff;
+  cursor:pointer;color:#fff;font-size:inherit;font-weight:inherit;
+  background:linear-gradient(135deg,#22d3ee,#2563eb);
+  display:flex;align-items:center;justify-content:center;flex-direction:row;
+  margin:-26px 6px 2px;padding:0;gap:0;position:relative;
+  box-shadow:0 8px 24px rgba(37,99,235,.42);
+  transition:transform .08s ease;
+}
+.tabbar .tab-camera:active{transform:scale(.93);}
+.tabbar button[data-tab]{flex:1;}
+
+/* v16.1: visible scan-mode segmented control */
+.mode-seg{margin:2px 2px 0;}
+
+/* ==========================================================================
+ * v16.2: red + black app theme. Buttons are BLACK (never red).
+ * Red is the line/accent color. Blue is gone.
+ * ========================================================================== */
+:root{
+  --brand:#d63a4d;          /* red — lines, accents, active states */
+  --ink:#131313;            /* black — primary buttons, headings */
+  --ink-soft:#2b2b2b;
+}
+
+/* app-like shell: cleaner background, solid topbar */
+body{
+  background:#f2f3f5;
+}
+.topbar{
+  background:rgba(255,255,255,.92);
+  -webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);
+  border-bottom:1px solid rgba(0,0,0,.08);
+  border-radius:0;
+  box-shadow:none;
+  padding:12px 16px;
+}
+.topbar .name{color:var(--ink);font-weight:800;letter-spacing:-.01em;}
+.topbar .sub{color:#6b7280;}
+.topbar .sub b{color:var(--brand);}
+
+/* primary buttons: BLACK */
+.btn-primary{
+  background:var(--ink);
+  box-shadow:0 6px 18px rgba(0,0,0,.22);
+}
+.btn-primary:active{transform:scale(.98);}
+.scan-btn{
+  background:var(--ink);
+  box-shadow:0 6px 18px rgba(0,0,0,.22);
+}
+
+/* camera tab button: BLACK with red ring */
+.tabbar .tab-camera{
+  background:var(--ink);
+  border:3px solid #fff;
+  box-shadow:0 8px 24px rgba(0,0,0,.35), 0 0 0 2px var(--brand);
+}
+
+/* active tab: RED */
+.tabbar button.active{color:var(--brand);}
+.tabbar button.active .ticon{color:var(--brand);}
+
+/* segmented control: selected = black pill */
+.seg label:has(input:checked){
+  background:var(--ink);color:#fff;
+  box-shadow:0 3px 10px rgba(0,0,0,.25);
+}
+
+/* cards: tighter, app-like */
+.card{
+  border-radius:16px;
+  box-shadow:0 2px 12px rgba(0,0,0,.06);
+  border:1px solid rgba(0,0,0,.06);
+}
+.card-title{color:var(--ink);}
+.card-title .num{
+  background:var(--ink);color:#fff;
+}
+.card-title small{color:#9ca3af;}
+
+/* red accent lines */
+.mode-seg{border:1px solid rgba(214,58,77,.25);}
+.opts-summary .num{background:var(--brand);}
+
+/* verdict modal buttons */
+#verdictNextBtn{background:var(--ink);}
+
+/* result verdict colors stay: green PASS, red FAIL */
+
+/* v16.2: app-like scan card */
+.scan-card .hero-row{margin:0 0 4px;}
+.manual-entry{margin:8px 0 12px;border-top:1px solid rgba(0,0,0,.07);padding-top:8px;}
+.manual-entry summary{
+  font-size:.82rem;font-weight:700;color:#6b7280;cursor:pointer;
+  padding:8px 2px;list-style:none;display:flex;align-items:center;gap:6px;
+}
+.manual-entry summary::-webkit-details-marker{display:none;}
+.manual-entry summary::before{content:'+';color:var(--brand);font-weight:900;font-size:1rem;}
+.manual-entry[open] summary::before{content:'–';}
+.manual-entry textarea{margin-top:6px;}
+
+/* recent scans list */
+.recent-list{display:flex;flex-direction:column;gap:8px;}
+.recent-row{
+  display:flex;align-items:center;gap:10px;
+  background:#f8f9fb;border:1px solid rgba(0,0,0,.06);border-radius:12px;
+  padding:10px 12px;font-size:.82rem;
+}
+.recent-dot{width:10px;height:10px;border-radius:50%;flex:0 0 auto;}
+.recent-dot.pass{background:var(--green);}
+.recent-dot.fail{background:var(--brand);}
+.recent-info{flex:1;min-width:0;}
+.recent-info .r{font-weight:800;font-size:.78rem;letter-spacing:.04em;}
+.recent-info .r.pass{color:var(--green);}
+.recent-info .r.fail{color:var(--brand);}
+.recent-info .t{color:#9ca3af;font-size:.72rem;margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.recent-empty{color:#9ca3af;font-size:.82rem;text-align:center;padding:12px;}
+
+/* quiet text link button */
+.link-btn{
+  display:block;margin:6px auto 0;padding:10px 20px;
+  border:none;background:none;color:#9ca3af;font-size:.8rem;font-weight:600;
+  cursor:pointer;text-decoration:underline;text-underline-offset:3px;
+}
+.link-btn:active{color:var(--brand);}
+
+/* v16.4: assemblies steppers stack vertically (labels are long now) */
+.opts-body .counts{flex-direction:column;}
+.opts-body .count{padding:12px 14px;}
+.opts-body .stepper{max-width:280px;}
+
+/* v16.4: update banner (auto-update prompt) */
+.update-banner{
+  position:fixed;top:0;left:0;right:0;z-index:3000;
+  background:var(--ink);color:#fff;
+  display:none;align-items:center;justify-content:space-between;
+  padding:12px 16px;font-size:.82rem;font-weight:600;
+  box-shadow:0 4px 16px rgba(0,0,0,.25);
+}
+.update-banner.show{display:flex;}
+.update-banner button{
+  background:var(--brand);color:#fff;border:none;border-radius:10px;
+  padding:8px 16px;font-weight:800;font-size:.8rem;cursor:pointer;
+}
+
+/* v16.7: verdict uses the full screen height */
+.verdict-sheet{
+  min-height:70vh;
+  display:flex;flex-direction:column;justify-content:flex-end;
+}
+.verdict-sheet #verdictBody{flex:1;display:flex;flex-direction:column;justify-content:center;}
