@@ -249,10 +249,8 @@ function runLabelValidation(){
         let fa = assemblies.find(a => a.type === 'Final') || {};
         if (errs.length === 0) {
             resultBox.innerHTML = `<div class="pass" style="padding:22px 16px;border-radius:20px;text-align:center;box-shadow:0 4px 12px rgba(30,126,52,0.25);margin-bottom:10px;">
-                <div style="font-size:1.7rem;font-weight:900;margin-bottom:6px;">✓ PASS</div>
-                <div style="font-size:1.05rem;font-weight:700;margin-bottom:6px;">100% GMW 15862 COMPLIANT</div>
-                <div style="font-size:0.92rem;opacity:0.95;margin-bottom:10px;">FA Part #: <b>${fa.part || 'N/A'}</b> &bull; Trace: <b>${fa.trace || 'N/A'}</b></div>
-                <div style="display:inline-block;background:#fff;color:#1e7e34;padding:5px 14px;border-radius:20px;font-size:0.82rem;font-weight:800;">⚡ Scan Recorded (🕒 #${historyRecords.length}) • Ready for Next Label...</div>
+                <div style="font-size:1.7rem;font-weight:900;margin-bottom:8px;">✓ PASS</div>
+                <div style="font-size:1.15rem;font-weight:800;letter-spacing:.02em;">Trace: ${fa.trace || 'N/A'}</div>
             </div>` + manualMatchHtml;
         } else {
             resultBox.innerHTML = `<div class="fail" style="padding:22px 16px;border-radius:20px;text-align:center;box-shadow:0 4px 12px rgba(203,36,49,0.25);margin-bottom:10px;">
