@@ -535,3 +535,22 @@ body{
   cursor:pointer;text-decoration:underline;text-underline-offset:3px;
 }
 .link-btn:active{color:var(--brand);}
+
+/* v16.4: assemblies steppers stack vertically (labels are long now) */
+.opts-body .counts{flex-direction:column;}
+.opts-body .count{padding:12px 14px;}
+.opts-body .stepper{max-width:280px;}
+
+/* v16.4: update banner (auto-update prompt) */
+.update-banner{
+  position:fixed;top:0;left:0;right:0;z-index:3000;
+  background:var(--ink);color:#fff;
+  display:none;align-items:center;justify-content:space-between;
+  padding:12px 16px;font-size:.82rem;font-weight:600;
+  box-shadow:0 4px 16px rgba(0,0,0,.25);
+}
+.update-banner.show{display:flex;}
+.update-banner button{
+  background:var(--brand);color:#fff;border:none;border-radius:10px;
+  padding:8px 16px;font-weight:800;font-size:.8rem;cursor:pointer;
+}
