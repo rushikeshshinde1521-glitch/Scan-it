@@ -241,4 +241,5 @@ announceStandalone();
 applySettingsToUI();
 applyDotPinVisibility();
 renderHistoryTab();
+if(typeof renderRecent==='function') renderRecent();
 updateConnPill();

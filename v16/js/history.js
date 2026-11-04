@@ -24,6 +24,7 @@ function saveHistory(result,raw,errorReason,assemblies){
     historyRecords.push({timestamp:new Date().toISOString(),result:result,errorReason:errorReason,assemblies:assemblies,rawScanData:raw});
     persistHistory();
     updateHistoryCount();
+    if(typeof renderRecent==='function') renderRecent();
     playScanFeedback(result);
     try {
         let fa = assemblies.find(a => a.type === 'Final') || {};
@@ -173,3 +174,27 @@ function historyListHtml(){
 function renderHistoryTab(){ let b=document.getElementById('historyTabBody'); if(b) b.innerHTML=historyListHtml(); }
 
 /* ---------- settings UI ---------- */
+
+/* v16.2: recent scans strip on the scan tab — fills the screen like a real app */
+function renderRecent(){
+  let box=document.getElementById('recentList');
+  if(!box) return;
+  let recs=(typeof historyRecords!=='undefined'?historyRecords:[]).slice(-3).reverse();
+  if(!recs.length){
+    box.innerHTML='<div class="recent-empty">No scans yet — tap the camera to start.</div>';
+    return;
+  }
+  box.innerHTML=recs.map(r=>{
+    let ok=(r.result||'').toUpperCase()==='PASS';
+    let t='';
+    try{ t=new Date(r.timestamp).toLocaleString([], {month:'short',day:'numeric',hour:'numeric',minute:'2-digit'}); }catch(e){}
+    let trace='';
+    try{
+      let fa=(r.assemblies||[]).find(a=>a.type==='Final')||{};
+      trace=fa.trace||'';
+    }catch(e){}
+    return '<div class="recent-row"><span class="recent-dot '+(ok?'pass':'fail')+'"></span>'+
+      '<div class="recent-info"><div class="r '+(ok?'pass':'fail')+'">'+(ok?'PASS':'FAIL')+'</div>'+
+      '<div class="t">'+escapeHtml(trace||t||'')+'</div></div></div>';
+  }).join('');
+}
