@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<!DOCTYPE html>
+<html><head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>GM Scan Pro · GMW 15862</title>
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="GM Scan Pro">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#eef2f9">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="../apple-touch-icon.png">
+
+
+<link rel="stylesheet" href="css/app.css?v=16">
+<script src="vendor/zxing_reader.js"></script>
+<script src="js/engine-boot.js?v=16"></script>
+</head>
+<body data-tab="scan"><div class="app">
+<!-- top bar -->
+  <div class="topbar">
+    <div class="brand">
+      <div class="logo">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#04121f" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7V5a2 2 0 0 1 2-2h2M17 3h2a2 2 0 0 1 2 2v2M21 17v2a2 2 0 0 1-2 2h-2M7 21H5a2 2 0 0 1-2-2v-2"/><path d="M8 12h8M8 8h8M8 16h8"/></svg>
+      </div>
+      <div class="titles">
+        <div class="name">GM Scan Pro</div>
+        <div class="sub">GMW <b>15862</b> · Label Audit</div>
+      </div>
+    </div>
+    <div class="top-actions">
+      <span class="conn-pill" id="connPill" title="Duplicate-check connection">● Local</span>
+      <button class="icbtn" onclick="switchTab('history')" title="History" aria-label="History"><svg viewBox="0 0 24 24" width="21" height="21" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15.5 13.8"/></svg><span class="badge" id="historyBadgeCount">0</span></button>
+      <button class="icbtn" onclick="openHelpModal()" title="Help" aria-label="Help"><svg viewBox="0 0 24 24" width="21" height="21" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M9.1 9a3 3 0 0 1 5.8 1c0 2-3 2.5-3 3.5"/><circle cx="12" cy="17.4" r="0.4" fill="currentColor"/></svg></button>
+    </div>
+  </div>
+
+  
+  <section id="tab-scan" class="tabpage active">
+  <div id="dpmModeBanner" style="display:none;margin:2px 2px 10px;padding:10px 14px;border-radius:12px;background:linear-gradient(135deg,rgba(34,211,238,.14),rgba(37,99,235,.14));border:1px solid rgba(34,211,238,.45);font-size:.82rem;font-weight:700;color:var(--cyan2);">◉ DOT-PIN MODE — needle-etched marks on metal. For best results use <b>Photo</b> up close, and keep glare off the code.</div>
+<!-- HERO scanner card: camera-first. One camera button (the hero). -->
+  <div class="hero">
+    <div class="hero-glow"></div>
+    <button class="scan-hero-btn" onclick="startCameraScan()" aria-label="Scan label with camera">
+      <span class="corner tl"></span><span class="corner tr"></span>
+      <span class="corner bl"></span><span class="corner br"></span>
+      <span class="scan-hero-ico"><svg viewBox="0 0 24 24" width="44" height="44" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg></span>
+      <span class="scan-hero-txt">SCAN LABEL</span>
+      <span class="scan-hero-sub">Point at the Data Matrix</span>
+    </button>
+    <div class="hero-row">
+      <button class="btn-secondary" onclick="triggerPhotoScan()"><span class="i"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="4"/><circle cx="8.5" cy="8.5" r="1.6"/><path d="M20.5 16.5 15.6 11.6a1.5 1.5 0 0 0-2.12 0L6 19"/></svg></span>Photo</button>
+      <button class="btn-secondary" onclick="pasteFromClipboard()"><span class="i"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><rect x="8" y="2" width="8" height="4" rx="1"/><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1 2-2H6a2 2 0 0 1 2-2h2"/><path d="M9 12h6M9 16h6"/></svg></span>Paste</button>
+    </div>
+  </div>
+
+  <!-- Scan input -->
+  <div class="card">
+    <div class="card-title"><span class="num">▦</span> Scan Data <small>paste or auto-loaded</small></div>
+    <textarea id="scan" onpaste="handleTouchScreenPaste(event)" oninput="handleScanInput(event)" placeholder="Paste scan data here…"></textarea>
+    <div class="row2">
+      <button class="btn-primary" onclick="validateAndShow()">Validate</button>
+      <button class="btn-ghost" onclick="clearScan()">Clear</button>
+    </div>
+  </div>
+
+  <!-- Options: scan mode + assembly counts, collapsed by default -->
+  <details class="card opts">
+    <summary class="opts-summary"><span class="num">⚙</span> Options <small>scan mode & counts</small><span class="opts-chev">▾</span></summary>
+    <div class="opts-body">
+      <div class="card-title"><span class="num">1</span> Scan Mode <small>single vs continuous</small></div>
+      <div class="seg">
+        <label><input type="radio" name="scanMode" id="modeSingle" value="single" checked><span>Single Scan</span></label>
+        <label><input type="radio" name="scanMode" id="modeMulti" value="multi"><span>⚡ Multi-Scan</span></label>
+      </div>
+      <div class="card-title" style="margin-top:14px;"><span class="num">2</span> Assembly Counts <small>FA + SA</small></div>
+      <div class="counts">
+        <div class="count">
+          <div class="lbl">FA · FINAL</div>
+          <div class="stepper">
+            <button type="button" onclick="stepVal('f',-1)">−</button>
+            <input id="f" type="number" inputmode="numeric" value="1" min="0" max="1000" onchange="buildExpectedRules()">
+            <button type="button" onclick="stepVal('f',1)">+</button>
+          </div>
+        </div>
+        <div class="count">
+          <div class="lbl">SA · SUB-ASSEMBLY</div>
+          <div class="stepper">
+            <button type="button" onclick="stepVal('c',-1)">−</button>
+            <input id="c" type="number" inputmode="numeric" value="1" min="0" max="1000" onchange="buildExpectedRules()">
+            <button type="button" onclick="stepVal('c',1)">+</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </details>
+
+  <!-- RESULTS (verdict shows fullscreen; #out rests here when idle) -->
+  <div id="outHome"><div id="out"></div></div>
+
+  <div class="row2">
+    <button class="btn-ghost" onclick="resetAll()">Reset Form</button>
+  </div>
+  </section>
+
+  <section id="tab-history" class="tabpage">
+    <div class="card">
+      <div class="card-title"><span class="num">🕒</span> Scan History <small>last 20 on this device</small></div>
+      <div class="row2" style="margin-top:0;margin-bottom:12px;">
+        <button onclick="exportHistoryCsv()">Export CSV</button>
+        <button class="danger" onclick="clearHistory()">Clear History</button>
+      </div>
+      <div id="historyTabBody" class="history-list"></div>
+    </div>
+  </section>
+
+  <section id="tab-settings" class="tabpage">
+    <div class="card">
+      <div class="card-title"><span class="num">⚙</span> Label Rules <small>GMW 15862 fields</small></div>
+      <div class="field"><span>Expected DUNS</span>
+        <div class="duns-wrap"><span class="duns-prefix">12V</span><input id="setDuns" inputmode="numeric" autocomplete="off"
+               placeholder="606038362" maxlength="9" oninput="onDunsInput()"></div>
+      </div>
+      <div class="field-err" id="dunsErr"></div>
+      <div class="hint"><code>12V</code> is fixed — enter just the 9 digits. Labels whose DUNS field differs from <code>12V</code> + this fail validation. Saved on this device.</div>
+    </div>
+
+    <div class="card">
+      <div class="card-title"><span class="num">🎯</span> Manual Rules <small>expected values</small></div>
+    <div class="toggle-row">
+      <div class="toggle-txt"><div class="t">Manual Rules</div><div class="s">Verify parts against expected values</div></div>
+      <label class="switch"><input type="checkbox" id="showExpected" onchange="toggleExpected()"><span class="track"></span><span class="thumb"></span></label>
+    </div>
+    <div id="expectedBox" style="display:none;">
+      <div class="sub" style="margin-bottom:10px;">Leave fields blank to ignore that check.</div>
+      <div id="rules" class="rules-wrap"></div>
+    </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title"><span class="num">⧉</span> Duplicate Check <small>local + server</small></div>
+    <div class="toggle-row">
+      <div class="toggle-txt"><div class="t">Duplicate Check</div><div class="s">Flag repeated trace codes</div></div>
+      <label class="switch"><input type="checkbox" id="checkDup"><span class="track"></span><span class="thumb"></span></label>
+    </div>
+
+
+      <div class="set-label">Company server</div>
+      <div class="hint" style="margin-top:0;">The on-device check above always runs and works with no connection. Turn this on to also compare trace codes against the company server after each scan — the local check never changes.</div>
+      <div class="seg" style="margin-bottom:12px;">
+        <label><input type="radio" name="srvMode" value="off" onchange="onSrvModeChange('off')"><span>Off</span></label>
+        <label><input type="radio" name="srvMode" value="server" onchange="onSrvModeChange('server')"><span>Local + Server</span></label>
+      </div>
+      <div id="srvFields">
+        <label class="field"><span>Server URL</span>
+          <input id="setSrvUrl" inputmode="url" autocomplete="off" autocapitalize="off" spellcheck="false"
+                 placeholder="https://server.company.com:5000" oninput="onSrvSettingsInput()">
+        </label>
+        <label class="field"><span>API key <span class="soff">(optional — must match the server)</span></span>
+          <div class="pwrow">
+            <input id="setSrvKey" type="password" autocomplete="off" placeholder="••••••••" oninput="onSrvSettingsInput()">
+            <button type="button" onclick="toggleKeyVis()" title="Show/hide">👁</button>
+          </div>
+        </label>
+        <div class="row2">
+          <button onclick="testServerConnection()">Test connection</button>
+        </div>
+        <div class="srv-status" id="srvTestStatus">Not configured.</div>
+        <details class="apibox">
+          <summary>What the server must do <span style="font-weight:400;">(for your IT team)</span></summary>
+          <p style="margin:8px 0;">After each scan the app sends:</p>
+          <pre>POST {server URL}/api/duplicates/check
+Content-Type: application/json
+X-API-Key: (your key, if set)
+
+{ "traces": ["TABC123...", "TDEF456..."],
+  "device": "dev-9f3k2l8x",
+  "duns": "12V606038362" }</pre>
+          <p style="margin:8px 0;">The server answers:</p>
+          <pre>{ "duplicates": ["TABC123..."] }</pre>
+          <p style="margin:8px 0 0;">An empty list means no duplicates. The included <code>server.py</code> already implements exactly this — IT only points it at the real trace database (2 marked spots) and gives it a URL the shopfloor phones can reach.</p>
+        </details>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title"><span class="num">◉</span> Dot Pin <small>experimental</small></div>
+      <div class="toggle-row">
+        <div class="toggle-txt"><div class="t">Dot Pin Tab</div><div class="s">Needle-etched metal scanning (not ready to ship)</div></div>
+        <label class="switch"><input type="checkbox" id="setDotPin" onchange="onDotPinToggle()"><span class="track"></span><span class="thumb"></span></label>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title"><span class="num">📱</span> App</div>
+      <div class="pwa">
+        <span class="pin"><svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><rect x="7" y="2" width="10" height="20" rx="2.5"/><path d="M11 18h2"/><path d="M11 6h2"/></svg></span>
+        <div style="flex:1;min-width:0;"><div class="pt">Install to Phone</div><div class="ps">Full-screen &amp; offline auto-scanner</div></div>
+        <button onclick="setTimeout(launchInstalledApp,120);">Install</button>
+      </div>
+      <div class="row2">
+        <button onclick="resetAppSettings()">Reset settings</button>
+      </div>
+<div class="note">GM Scan Pro · GMW 15862 compliance validator.<br>Parsing &amp; validation engine unchanged.<br>Works as a mobile app — history is saved on this device until you clear it.</div>
+</div>
+
+
+    </div>
+  </section>
+</div>
+
+<div class="bottomdock">
+  <nav class="tabbar">
+    <button data-tab="scan" class="active" onclick="switchTab('scan')"><span class="ticon"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7V5a2 2 0 0 1 2-2h2M17 3h2a2 2 0 0 1 2 2v2M21 17v2a2 2 0 0 1-2 2h-2M7 21H5a2 2 0 0 1-2-2v-2"/><circle cx="12" cy="12" r="3.2"/></svg></span>Scan</button>
+    <button data-tab="dotpin" onclick="switchTab('dotpin')"><span class="ticon"><svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor"><circle cx="6.5" cy="6.5" r="1.7"/><circle cx="12" cy="6.5" r="1.7"/><circle cx="17.5" cy="6.5" r="1.7"/><circle cx="6.5" cy="12" r="1.7"/><circle cx="17.5" cy="12" r="1.7"/><circle cx="6.5" cy="17.5" r="1.7"/><circle cx="12" cy="17.5" r="1.7"/><circle cx="17.5" cy="17.5" r="1.7"/></svg></span>Dot Pin</button>
+    <button data-tab="history" onclick="switchTab('history')"><span class="ticon"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15.5 13.8"/></svg></span>History<span class="tbadge" id="tabHistoryBadge" style="display:none;">0</span></button>
+    <button data-tab="settings" onclick="switchTab('settings')"><span class="ticon"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></span>Settings</button>
+  </nav>
+</div>
+
+<!-- hidden file input -->
+<input type="file" id="imageInput" accept="image/*" style="display:none;" onchange="handleImageScan(event)">
+
+<!-- CAMERA MODAL -->
+<div id="cameraModal" class="modal-overlay" onclick="handleCameraModalClick(event)">
+  <div class="modal-content" style="max-width:520px;">
+    <div class="modal-header">
+      <h3><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg> Live Barcode Scanner</h3>
+      <button class="modal-close-btn" onclick="stopCameraScan(true)" aria-label="Close">&times;</button>
+    </div>
+    <div class="modal-body" style="text-align:center;">
+      <p class="hint" style="margin-top:0;margin-bottom:12px;">Point your camera at the GM Data Matrix or Code 128 label.<br>Curved pipe? Move <b>slowly</b> across the curve and keep the code square to the lens — a sharp frame decodes instantly.</p>
+      <div id="qr-reader"></div>
+      <div id="cameraStatus" style="margin-top:12px;"></div>
+      <div class="camtools">
+        <button onclick="triggerAutoFocus()">🎯 Auto-Focus</button>
+        <button onclick="toggleCameraTorch()" id="torchBtn">⚡ Light</button>
+        <button onclick="switchCameraFacing()">🔄 Switch</button>
+        <button onclick="triggerPhotoScan(); stopCameraScan(true);"><svg viewBox="0 0 24 24" width="16" height="16" style="vertical-align:-3px;margin-right:4px;" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="4"/><circle cx="8.5" cy="8.5" r="1.6"/><path d="M20.5 16.5 15.6 11.6a1.5 1.5 0 0 0-2.12 0L6 19"/></svg>Use Photo</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- VERDICT MODAL: fullscreen PASS/FAIL takeover (v16) -->
+<div id="verdictModal" class="verdict-overlay">
+  <div class="verdict-sheet">
+    <div id="verdictBody"></div>
+    <button class="btn-primary btn-block" id="verdictNextBtn" onclick="closeVerdict(true)">SCAN NEXT LABEL</button>
+    <button class="btn-ghost btn-block" onclick="closeVerdict(false)">Close</button>
+  </div>
+</div>
+
+<!-- HISTORY MODAL -->
+<div id="historyModal" class="modal-overlay" onclick="handleModalClick(event)">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h3><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> Recent Scans (Last 20)</h3>
+      <button class="modal-close-btn" onclick="closeHistoryModal()" aria-label="Close">&times;</button>
+    </div>
+    <div class="modal-body" id="historyModalBody"><!-- JS --></div>
+  </div>
+</div>
+
+<!-- HELP MODAL -->
+<div id="helpModal" class="modal-overlay" onclick="handleHelpModalClick(event)">
+  <div class="modal-content" style="max-width:520px;text-align:left;">
+    <div class="modal-header">
+      <h3><span style="font-size:1.2rem;">💡</span> App Guide · GMW 15862</h3>
+      <button class="modal-close-btn" onclick="closeHelpModal()" aria-label="Close">&times;</button>
+    </div>
+    <div class="modal-body guide-body">
+      <div class="pwa" style="margin-bottom:14px;">
+        <span class="pin"><svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><rect x="7" y="2" width="10" height="20" rx="2.5"/><path d="M11 18h2"/><path d="M11 6h2"/></svg></span>
+        <div style="flex:1;min-width:0;"><div class="pt">Install to Phone</div><div class="ps">Full-screen &amp; offline auto-scanner</div></div>
+        <button onclick="closeHelpModal(); setTimeout(launchInstalledApp,120);">Install</button>
+      </div>
+      <div class="gblk"><b>1. Scan Mode.</b><br>Multi-scan clears the box and shows a quick confirmation after every passing scan. A failed scan always shows full details.</div>
+      <div class="gblk"><b>2. Assembly Counts.</b><br>Set how many Final (FA) and Sub-Assembly (SA) scans each label contains. FA scans are validated first.</div>
+      <div class="gblk"><b>3. Manual Rules.</b><br>Toggle to enter expected Part Numbers &amp; VPPS prefixes for exact-match verification.</div>
+      <div class="gblk"><b>4. Install.</b><br>Tap Share ➔ "Add to Home Screen" for a full-screen, offline PWA experience.</div>
+    </div>
+  </div>
+</div>
+
+<div id="toast" class="toast"></div>
+<script src="js/config.js?v=16"></script>
+<script src="js/utils.js?v=16"></script>
+<script src="js/dpm.js?v=16"></script>
+<script src="js/parser.js?v=16"></script>
+<script src="js/scanner.js?v=16"></script>
+<script src="js/history.js?v=16"></script>
+<script src="js/settings.js?v=16"></script>
+<script src="js/ui.js?v=16"></script>
+</body>
+</html>
