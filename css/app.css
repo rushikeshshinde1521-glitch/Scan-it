@@ -376,16 +376,9 @@ body[data-tab="scan"] .bottomdock .actionbar,body[data-tab="dotpin"] .bottomdock
 .scan-hero-sub{font-size:.82rem;font-weight:600;opacity:.75;}
 .hero .hero-row{display:flex;gap:10px;margin-top:12px;}
 
-/* Options disclosure */
-details.opts{padding:0;}
-details.opts summary{list-style:none;cursor:pointer;}
-details.opts summary::-webkit-details-marker{display:none;}
-.opts-summary{display:flex;align-items:center;gap:8px;padding:16px;font-weight:800;font-size:.95rem;}
-.opts-summary .num{display:inline-flex;align-items:center;justify-content:center;width:26px;height:26px;border-radius:9px;background:linear-gradient(135deg,rgba(34,211,238,.18),rgba(37,99,235,.18));font-size:.85rem;}
-.opts-summary small{color:var(--muted);font-weight:600;font-size:.75rem;}
-.opts-chev{margin-left:auto;color:var(--muted);transition:transform .2s;}
-details.opts[open] .opts-chev{transform:rotate(180deg);}
-.opts-body{padding:0 16px 16px;}
+/* Assemblies card — always open (v17.1: no dropdown) */
+div.opts{padding:16px;}
+.opts-body{padding:0;}
 
 /* Verdict takeover: fullscreen PASS/FAIL moment */
 .verdict-overlay{
