@@ -1,7 +1,7 @@
 /* GM Scan Pro - Service Worker
    Caches the app shell so the PWA works fully offline.
    Bump CACHE_NAME on every release so devices pick up the new files. */
-const CACHE_NAME = 'gm-scan-pro-v17';
+const CACHE_NAME = 'gm-scan-pro-v17-1';
 const APP_SHELL = [
   './',
   './index.html',
@@ -9,16 +9,16 @@ const APP_SHELL = [
   './icon-192.png',
   './icon-512.png',
   './apple-touch-icon.png',
-  './css/app.css?v=25',
-  './js/engine-boot.js?v=25',
-  './js/config.js?v=25',
-  './js/utils.js?v=25',
-  './js/dpm.js?v=25',
-  './js/parser.js?v=25',
-  './js/scanner.js?v=25',
-  './js/history.js?v=25',
-  './js/settings.js?v=25',
-  './js/ui.js?v=25',
+  './css/app.css?v=26',
+  './js/engine-boot.js?v=26',
+  './js/config.js?v=26',
+  './js/utils.js?v=26',
+  './js/dpm.js?v=26',
+  './js/parser.js?v=26',
+  './js/scanner.js?v=26',
+  './js/history.js?v=26',
+  './js/settings.js?v=26',
+  './js/ui.js?v=26',
   './vendor/zxing_reader.js',
   './vendor/zxing_reader.wasm'
 ];
@@ -38,7 +38,7 @@ self.addEventListener('activate', (event) => {
       .then((keys) => Promise.all(keys.map((k) => {
         // v17: production — clean up ALL old caches (v15 shopfloor + v16 test builds).
         // Future v17.x updates only delete their own old v17 caches.
-        if (k !== CACHE_NAME && (k.indexOf('gm-scan-pro-v15') === 0 || k.indexOf('gm-scan-pro-v16') === 0 || k.indexOf('gm-scan-pro-v17') === 0)) return caches.delete(k);
+        if (k !== CACHE_NAME && (k.indexOf('gm-scan-pro-v15') === 0 || k.indexOf('gm-scan-pro-v16') === 0 || k.indexOf('gm-scan-pro-v17-1') === 0)) return caches.delete(k);
       })))
       .then(() => self.clients.claim())
   );

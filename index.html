@@ -13,9 +13,9 @@
 <link rel="apple-touch-icon" href="../apple-touch-icon.png">
 
 
-<link rel="stylesheet" href="css/app.css?v=25">
+<link rel="stylesheet" href="css/app.css?v=26">
 <script src="vendor/zxing_reader.js"></script>
-<script src="js/engine-boot.js?v=25"></script>
+<script src="js/engine-boot.js?v=26"></script>
 </head>
 <body data-tab="scan">
 <div class="update-banner" id="updateBanner"><span>New version available</span><button id="updateBtn">Update</button></div>
@@ -61,9 +61,8 @@
     <button class="btn-primary btn-block" onclick="validateAndShow()">Validate</button>
   </div>
 
-  <!-- Options: scan mode + assembly counts, collapsed by default -->
-  <details class="card opts">
-    <summary class="opts-summary"><span class="num">⚙</span> Assemblies <small>final + converters</small><span class="opts-chev">▾</span></summary>
+  <!-- Assemblies: always visible (no dropdown) -->
+  <div class="card opts">
     <div class="opts-body">
       <div class="card-title"><span class="num">1</span> Assemblies <small>how many of each</small></div>
       <div class="counts">
@@ -85,16 +84,10 @@
         </div>
       </div>
     </div>
-  </details>
+  </div>
 
   <!-- RESULTS (verdict shows fullscreen; #out rests here when idle) -->
   <div id="outHome"><div id="out"></div></div>
-
-  <!-- Recent scans (v16.2: fills the screen like a real app) -->
-  <div class="card recent-card">
-    <div class="card-title"><span class="num">◷</span> Recent <small>this device</small></div>
-    <div id="recentList" class="recent-list"></div>
-  </div>
 
   <button class="btn-secondary btn-block" onclick="resetAll()">Reset</button>
   </section>
@@ -281,13 +274,13 @@ X-API-Key: (your key, if set)
 </div>
 
 <div id="toast" class="toast"></div>
-<script src="js/config.js?v=25"></script>
-<script src="js/utils.js?v=25"></script>
-<script src="js/dpm.js?v=25"></script>
-<script src="js/parser.js?v=25"></script>
-<script src="js/scanner.js?v=25"></script>
-<script src="js/history.js?v=25"></script>
-<script src="js/settings.js?v=25"></script>
-<script src="js/ui.js?v=25"></script>
+<script src="js/config.js?v=26"></script>
+<script src="js/utils.js?v=26"></script>
+<script src="js/dpm.js?v=26"></script>
+<script src="js/parser.js?v=26"></script>
+<script src="js/scanner.js?v=26"></script>
+<script src="js/history.js?v=26"></script>
+<script src="js/settings.js?v=26"></script>
+<script src="js/ui.js?v=26"></script>
 </body>
 </html>
